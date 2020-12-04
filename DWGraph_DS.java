@@ -1,27 +1,60 @@
 package api;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class DWGraph_DS implements directed_weighted_graph {
+
+public class DWGraph_DS implements directed_weighted_graph , Serializable{
 	
+	private static final long serialVersionUID = 1L;
 	private HashMap<Integer, node_data> nodesInGraph;
 	private HashMap<Integer,HashMap<Integer,EdgeData>> edges;
-	private HashMap<Integer, Collection<node_data>> neighbors;
-	private HashMap<Integer, Collection<Integer>> pointers;				
+	private HashMap<Integer, Collection<node_data>> neighbors;	
+	private HashMap<Integer, Collection<node_data>> pointers;	
 	private int edgeSiz=0;
 	private int mcCounter=0;
 	
 	public DWGraph_DS()
 	{
-		this.pointers = new HashMap<Integer, Collection<Integer>>();
+		this.pointers = new HashMap<Integer, Collection<node_data>> ();
 		this.nodesInGraph = new HashMap<Integer, node_data>();
 		this.edges = new HashMap<Integer, HashMap<Integer,EdgeData>>();
 		this.neighbors = new HashMap<Integer, Collection<node_data>>();
 	}
+
+	public void setEdgeSize(int size)
+	{
+		this.edgeSiz = size;
+	}
 	
+	public void setMC(int size)
+	{
+		this.mcCounter = size;
+	}
+	
+	public String toString()
+	{
+		String ans = "";
+		for(node_data a: nodesInGraph.values())
+		{
+			if(neighbors.get(a.getKey()).size()>0)
+			{
+				for(node_data b: neighbors.get(a.getKey()))
+				{
+					ans=ans+ a.getKey() + " " + b.getKey()+" " +  edges.get(a.getKey()).get(b.getKey()).getWeight() + "\n";
+					
+				}
+			}
+			else
+			{
+				ans = ans + a.getKey() + "\n";
+			}	
+		}
+		return ans;
+	}
 	@Override
 	public node_data getNode(int key) {
 		if(nodesInGraph.containsKey(key))
@@ -30,7 +63,13 @@ public class DWGraph_DS implements directed_weighted_graph {
 		}
 		return null;
 	}
-
+   public Collection<node_data> getPointers(int key){
+	   if(pointers.containsKey(key))
+	   return pointers.get(key);
+	   return null;
+   }
+	
+	
 	@Override
 	public edge_data getEdge(int src, int dest)
 	{		
@@ -47,7 +86,7 @@ public class DWGraph_DS implements directed_weighted_graph {
 		if(!nodesInGraph.containsKey(n.getKey()))
 		{
 			nodesInGraph.put(n.getKey(), n);
-			pointers.put(n.getKey(), new LinkedList<Integer>());
+			pointers.put(n.getKey(), new LinkedList<node_data>());
 			neighbors.put(n.getKey(), new LinkedList<node_data>());
 			mcCounter++;
 		}
@@ -78,21 +117,21 @@ public class DWGraph_DS implements directed_weighted_graph {
 					//There are neighbors but dest(node) is not one of them
 					else
 					{
-						HashMap<Integer, EdgeData> innerHash = new HashMap<Integer, EdgeData>();
+				//HashMap<Integer, EdgeData> innerHash = new HashMap<Integer, EdgeData>();
 						EdgeData temp = new EdgeData();
 						temp.setDest(dest);
 						temp.setSrc(src);
 						temp.setWeight(w);
-						innerHash.put(dest, temp);
-						pointers.get(dest).add(nodesInGraph.get(src).getKey());
-						// Add the destination node to the "neighbors" collection
+				//		innerHash.put(dest, temp);
+						edges.get(src).put(dest, temp);
+						pointers.get(dest).add(nodesInGraph.get(src));
 						neighbors.get(src).add(nodesInGraph.get(dest));
 						edgeSiz++;
 						mcCounter++;
-					}					
+					}
+					
+					return;
 				}
-				else 
-				{
 				//the source node don't have neighbor
 				HashMap<Integer, EdgeData> innerHash = new HashMap<Integer, EdgeData>();
 				EdgeData temp = new EdgeData();
@@ -101,11 +140,10 @@ public class DWGraph_DS implements directed_weighted_graph {
 				temp.setWeight(w);
 				innerHash.put(dest, temp);
 				edges.put(src, innerHash);
-				pointers.get(dest).add(nodesInGraph.get(src).getKey());
+				pointers.get(dest).add(nodesInGraph.get(src));
 				neighbors.get(src).add(nodesInGraph.get(dest));
 				edgeSiz++;
 				mcCounter++;
-				}
 			}
 		}
 	}
@@ -151,16 +189,16 @@ public class DWGraph_DS implements directed_weighted_graph {
 			//If this node is the destination of a directed edge.
 			if(pointers.get(key)!=null)
 			{
-				Iterator<Integer> a = pointers.get(key).iterator();
+				Iterator<node_data> a = pointers.get(key).iterator();
 				while(a.hasNext())
 				{
-					removeEdge(a.next(), key);				
+					removeEdge(a.next().getKey(), key);				
 				}
 			}
 			node_data temp = nodesInGraph.get(key);
-			nodesInGraph.remove(key);	
-			neighbors.keySet().remove(key);
-			pointers.keySet().remove(key);
+			nodesInGraph.remove(key);
+			neighbors.keySet().remove(key);	
+			pointers.keySet().remove(key);	
 			edges.keySet().remove(key);
 			mcCounter++;
 			// maybe we should add "nodesInGraph.keySet().remove(key)"?
@@ -189,19 +227,14 @@ public class DWGraph_DS implements directed_weighted_graph {
 				 * 		4 <--------5
 				 */
 				edges.get(src).remove(dest);
-				if(edges.get(src).size()==0)
-				{
-					edges.keySet().remove(src);
-				}
+				
 				/*
 				 * Second we should remove the src from the 
 				 * 			 collection of the dest pointers.
 				 * The HashMap should look like this:
 				 * (From)4 ----> {6,5}  ==> (To) 4 ----> {5}
 				 */
-				pointers.get(dest).remove(src);
-				
-				//Remove the destination node from the collection of the "neighbors"
+				pointers.get(dest).remove(nodesInGraph.get(src));
 				neighbors.get(src).remove(nodesInGraph.get(dest));
 				edgeSiz--;
 				mcCounter++;
@@ -216,6 +249,7 @@ public class DWGraph_DS implements directed_weighted_graph {
 	{
 		return neighbors.get(src);
 	}
+
 	@Override
 	public int nodeSize() 
 	{
@@ -227,98 +261,11 @@ public class DWGraph_DS implements directed_weighted_graph {
 	{
 		return edgeSiz;
 	}
-
+	
 	@Override
 	public int getMC() 
 	{
 		return mcCounter;
 	}
-
-/////////////////////////internal class NodeData///////////////////////////////
-	public class NodeData implements node_data{
-		private int key;
-		private GeoLocation geoL;
-		private double weight;
-		private String info;
-		private int tag;
-		
-		
-		
-		public NodeData()
-		{
-			this.key = 0;
-			this.geoL = new GeoLocation();
-			this.weight = 0; // Maybe it should be infinite
-			this.info = "";
-			this.tag = 0;
-		}
-		
-		public NodeData(int key)
-		{
-			this.key = key;
-			this.geoL = new GeoLocation();
-			this.weight = 0; // Maybe it should be infinite
-			this.info = "";
-			this.tag = 0;
-		}
-		
-		public String toString()
-		{
-			return "This key: " + key;
-		}
-		
-		@Override
-		public int getKey() {
-			return this.key;
-		}
-
-		@Override
-		public geo_location getLocation() {
-			return geoL;
-		}
-
-		@Override
-		public void setLocation(geo_location p) {
-			this.geoL = (GeoLocation)p;
-		}
-
-		@Override
-		public double getWeight() {
-			return this.weight;
-		}
-
-		@Override
-		public void setWeight(double w) {
-			this.weight=w;
-			
-		}
-
-		@Override
-		public String getInfo() {
-			
-			return this.info;
-		}
-
-		@Override
-		public void setInfo(String s) {
-			this.info=s;
-			
-		}
-
-		@Override
-		public int getTag() {
-			
-			return this.tag;
-		}
-
-		@Override
-		public void setTag(int t) {
-			this.tag=t;
-			
-		}
-		
-	}
-////////////////internal class GeoLocation/////////////////////////////////////
-	
 	
 }
