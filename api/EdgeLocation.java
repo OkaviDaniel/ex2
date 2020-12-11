@@ -10,7 +10,8 @@ public class EdgeLocation implements edge_location
 	}
 
 	@Override
-	public double getRatio() {
+	public double getRatio() 
+	{
 		return 0;
 	}
 

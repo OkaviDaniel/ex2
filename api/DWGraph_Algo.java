@@ -211,11 +211,39 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 
 	@Override
 	public boolean save(String file) {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		String json = gson.toJson(g);
+		String json1 = "{";
+		json1 = json1 + "\"Edges\":[";
+		for(EdgeData e: ((DWGraph_DS)g).getEdges())
+		{
+			json1 = json1 + e.toJson() + ",";
+		}
+		//Getting rid of the last ','
+		int tmp1 = json1.length();
+		String json2 = "";
+		for(int i = 0; i<tmp1-1;i++)
+		{
+			json2 = json2 + json1.charAt(i);
+		}
+		//and then adding the '],'
+		json2 = json2 + "],";
+		
+		//For nodes
+		String json3 = "\"Nodes\":[";
+		for(node_data n: g.getV())
+		{
+			json3 = json3 + ((NodeData)n).toJson()+ ",";
+		}
+		int tmp2=json3.length();
+		String json4 = "";
+		for (int i = 0; i < tmp2-1; i++) {
+			json4 = json4 + json3.charAt(i);
+		}
+		json4 = json4 + "]}";
+		String ans = json2 + json4;
+		
 		try {
 			PrintWriter aw = new PrintWriter(new File(file));
-			aw.write(json);
+			aw.write(ans);
 			aw.close();
 			return true;
 		}catch(FileNotFoundException e){
@@ -231,7 +259,6 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 			GsonBuilder builder = new GsonBuilder();
 			builder.registerTypeAdapter(DWGraph_DS.class, new graphDeserializer());
 		//	builder.registerTypeAdapter(NodeData.class, new NodeDataInstanceCreator());
-		//	System.out.println("I've been here");
 			Gson gson = builder.create();
 			
 			FileReader reader = new FileReader(file);

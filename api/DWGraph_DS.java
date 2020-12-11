@@ -1,6 +1,7 @@
 package api;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -92,6 +93,19 @@ public class DWGraph_DS implements directed_weighted_graph , Serializable{
 		}
 	}
 
+	
+	public Collection<EdgeData> getEdges()
+	{
+		ArrayList<EdgeData> ans = new ArrayList<EdgeData>();
+		for(Integer i : edges.keySet())
+		{
+			for(Integer j: edges.get(i).keySet())
+			{
+				ans.add(edges.get(i).get(j));
+			}
+		}
+		return ans;
+	}
 	@Override
 	public void connect(int src, int dest, double w) 
 	{		

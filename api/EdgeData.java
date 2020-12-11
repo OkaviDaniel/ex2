@@ -17,6 +17,14 @@ public class EdgeData implements edge_data{
 		this.info="";
 	}
 	
+	public EdgeData(int src, int dest, double weight)
+	{
+		this.src = src;
+		this.dest = dest;
+		this.weight = weight;
+		this.tag=0;
+		this.info="";
+	}
 	public EdgeData(int src, int dest, int tag, double weight, String info)
 	{
 		this.src = src;
@@ -26,6 +34,16 @@ public class EdgeData implements edge_data{
 		this.info = info;
 	}
 	
+	public String toJson()
+	{
+		String ans = 
+				"{"
+				+ "\"src\":" + this.src+","
+				+ "\"w\":" + this.weight+","
+				+ "\"dest\":" + this.dest
+				+ "}";
+		return ans;
+	}
 	public void setSrc(int s)
 	{
 		this.src = s;

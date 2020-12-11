@@ -7,6 +7,15 @@ public class GeoLocation implements geo_location
 	private double y;
 	private double z;
 	
+	public String toString()
+	{
+		String ans = "";
+		ans = ans + x + ",";
+		ans = ans + y + ",";
+		ans = ans + z;
+		return ans;
+	}
+	
 	public GeoLocation()
 	{
 		this.x=0;

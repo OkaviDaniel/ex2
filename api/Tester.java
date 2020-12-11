@@ -15,7 +15,7 @@ public class Tester {
 			a.setLocation(new GeoLocation(3+i,5+i*2,Math.pow(2, i)));
 			g.addNode(a);
 		}
-		
+	
 		DWGraph_Algo ga = new DWGraph_Algo();
 		ga.init(g);
 		
@@ -31,8 +31,9 @@ public class Tester {
 		g.connect(7, 8, 10);
 		g.connect(8, 9, 10);
 		g.connect(9, 0, 10);
-		//ga.load("hello.json");
+		
 		ga.save("hello.json");
+		ga.load("hello.json");
 		System.out.println(ga.connectedOrNot());
 		System.out.println(ga.shortestPathDist(0, 5));
 		System.out.println(ga.shortestPath(0, 5));

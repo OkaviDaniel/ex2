@@ -21,7 +21,6 @@ public class NodeData implements node_data{
 		return "" + this.key;
 	}
 	 public NodeData(node_data other)
-	
 	 { 
 	        this.key = other.getKey();
 	        this.setLocation(other.getLocation());
@@ -40,6 +39,15 @@ public class NodeData implements node_data{
 	 }
 	
 	
+	public String toJson()
+	{
+		String ans = 
+				"{"
+				+ "\"pos\":"+"\""+this.geoL.toString()+"\""+","
+				+ "\"id\":"+this.key
+				+ "}";		
+		return ans;
+	}
 	@Override
 	public int getKey() {
 		return this.key;
