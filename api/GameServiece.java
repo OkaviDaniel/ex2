@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import gameClient.CL_Agent;
+import gameClient.Agent;
 import gameClient.Pokemon;
 
 public class GameServiece implements game_service
@@ -14,13 +14,13 @@ public class GameServiece implements game_service
 
 	private DWGraph_DS g;
 	private ArrayList<Pokemon> pokemons;
-	private ArrayList<CL_Agent> agents;
+	private ArrayList<Agent> agents;
 	
 	
 	public GameServiece()
 	{
 		pokemons = new ArrayList<Pokemon>();
-		agents   = new ArrayList<CL_Agent>();
+		agents   = new ArrayList<Agent>();
 	}
 	
 	@Override

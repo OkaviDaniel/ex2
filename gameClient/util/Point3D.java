@@ -7,14 +7,9 @@ import api.geo_location;
 
 import java.io.Serializable;
 
-public class Point3D implements geo_location, Serializable{
+public class Point3D extends Constants implements geo_location, Serializable{
+
 	private static final long serialVersionUID = 1L;
-	/**
-     * Simple set of constants - should be defined in a different class (say class Constants).*/
-    public static final double EPS1 = 0.001, EPS2 = Math.pow(EPS1,2), EPS=EPS2;
-    /**
-     * This field represents the origin point:[0,0,0]
-     */
     public static final Point3D ORIGIN = new Point3D(0,0,0);
     private double _x,_y,_z;
     public Point3D(double x, double y, double z) {

@@ -20,8 +20,8 @@ public class Agent {
 	private edge_data curr_edge;
 	private node_data curr_node;
 	private directed_weighted_graph gg;
-	private CL_Pokemon curr_fruit;
-	//private long sg_dt;
+	private Pokemon curr_fruit;
+	private long sg_dt;
 	private double value;
 	
 	
@@ -89,6 +89,7 @@ public class Agent {
 		return ans;	
 	}
 	
+	public int getSrcNode() {return this.curr_node.getKey();}
 	
 	public void setSpeed(int i) {
 		this.speed = i;
@@ -108,16 +109,29 @@ public class Agent {
 		if(curr_edge!=null) 
 		{
 			ans=true;
+			id = dest;
 		}
 		else 
 		{
 			curr_edge = null;
+			id =-1;
 		}
 		return ans;
 	}
 	
+	
+	public void setCurrNode(int src) {
+		this.curr_node = gg.getNode(src);
+	}
+	
+	public boolean isMoving() {
+		return this.curr_edge!=null;
+	}
+	
+	
+	
 	public int getNextNode() {
-		int ans = -2; //??
+		int ans = -2;
 		if(this.curr_edge==null) 
 		{
 			ans = -1;
@@ -127,6 +141,79 @@ public class Agent {
 			ans = this.curr_edge.getDest();
 		}
 		return ans;
+	}
+	
+	public String toString() {
+		return toJSON();
+	}
+	
+	public String toString1() {
+		String ans=""+this.getID()+","+pos+", "+isMoving()+","+this.getValue();	
+		return ans;
+	}
+	public int getID() {
+		return this.id;
+	}
+
+	public geo_location getLocation() {
+		return pos;
+	}
+
+	
+	public double getValue() {
+		return this.value;
+	}
+
+
+	public double getSpeed() {
+		return this.speed;
+	}
+
+	public void setSpeed(double v) {
+		this.speed = v;
+	}
+	
+	public Pokemon get_curr_fruit() {
+		return curr_fruit;
+	}
+	
+	public void set_curr_fruit(Pokemon curr_fruit) {
+		this.curr_fruit = curr_fruit;
+	}
+	
+	
+	public void set_SDT(long ddtt) 
+	{
+		long ddt = ddtt;
+		if(this.curr_edge!=null)
+		{
+			double w = get_curr_edge().getWeight();
+			geo_location dest = gg.getNode(get_curr_edge().getDest()).getLocation();
+			geo_location src = gg.getNode(get_curr_edge().getSrc()).getLocation();
+			double de = src.distance(dest);
+			double dist = pos.distance(dest);
+			if(this.get_curr_fruit().get_edge()==this.get_curr_edge()) {
+				 dist = curr_fruit.getLocation().distance(this.pos);
+			}
+			double norm = dist/de;
+			double dt = w*norm / this.getSpeed(); 
+			ddt = (long)(1000.0*dt);
+		}
+		this.set_sg_dt(ddt);
+	}
+	
+	public edge_data get_curr_edge()
+	{
+		return this.curr_edge;
+	}
+	
+	public long get_sg_dt() {
+		return sg_dt;
+	}
+	
+	public void set_sg_dt(long _sg_dt) 
+	{
+		this.sg_dt = _sg_dt;
 	}
 	
 }

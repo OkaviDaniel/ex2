@@ -24,44 +24,44 @@ import gameClient.util.Range2Range;
  */
 public class Arena {
 	public static final double EPS1 = 0.001, EPS2=EPS1*EPS1, EPS=EPS2;
-	private directed_weighted_graph _gg;
-	private List<CL_Agent> _agents;
-	private List<CL_Pokemon> _pokemons;
-	private List<String> _info;
+	private directed_weighted_graph gg;
+	private List<Agent> agents;
+	private List<Pokemon> pokemons;
+	private List<String> info;
 	private static Point3D MIN = new Point3D(0, 100,0);
 	private static Point3D MAX = new Point3D(0, 100,0);
 
 	public Arena() 
 	{
-		_info = new ArrayList<String>();
+		info = new ArrayList<String>();
 	}
 	
-	private Arena(directed_weighted_graph g, List<CL_Agent> r, List<CL_Pokemon> p) 
+	private Arena(directed_weighted_graph g, List<Agent> r, List<Pokemon> p) 
 	{
 		setGraph(g);
 		this.setAgents(r);
 		this.setPokemons(p);
 	}
 	
-	public void setPokemons(List<CL_Pokemon> f) 
+	public void setPokemons(List<Pokemon> f) 
 	{
-		this._pokemons = f;
+		this.pokemons = f;
 	}
 	
-	public void setAgents(List<CL_Agent> f) {
-		this._agents = f;
+	public void setAgents(List<Agent> f) {
+		this.agents = f;
 	}
 	
 	public void setGraph(directed_weighted_graph g)
 	{
-		this._gg =g;
+		this.gg =g;
 	}//init();}
 	
 	private void init() 
 	{
 		MIN=null; MAX=null;
 		double x0=0,x1=0,y0=0,y1=0;
-		Iterator<node_data> iter = _gg.getV().iterator();
+		Iterator<node_data> iter = gg.getV().iterator();
 		while(iter.hasNext())
 		{
 			geo_location c = iter.next().getLocation();
@@ -96,33 +96,34 @@ public class Arena {
 		
 	}
 	
-	public List<CL_Agent> getAgents() {return _agents;}
+	public List<Agent> getAgents() {return agents;}
 	
-	public List<CL_Pokemon> getPokemons() {return _pokemons;}
+	public List<Pokemon> getPokemons() {return pokemons;}
 
 	
 	public directed_weighted_graph getGraph() 
 	{
-		return _gg;
+		return gg;
 	}
 	
 	public List<String> get_info() 
 	{
-		return _info;
+		return info;
 	}
 	
 	public void set_info(List<String> _info) {
-		this._info = _info;
+		this.info = _info;
 	}
 
 	////////////////////////////////////////////////////
-	public static List<CL_Agent> getAgents(String aa, directed_weighted_graph gg) {
-		ArrayList<CL_Agent> ans = new ArrayList<CL_Agent>();
+	public static List<Agent> getAgents(String aa, directed_weighted_graph gg) {
+		
+		ArrayList<Agent> ans = new ArrayList<Agent>();
 		try {
 			JSONObject ttt = new JSONObject(aa);
 			JSONArray ags = ttt.getJSONArray("Agents");
 			for(int i=0;i<ags.length();i++) {
-				CL_Agent c = new CL_Agent(gg,0);
+				Agent c = new Agent(gg,0);
 				c.update(ags.get(i).toString());
 				ans.add(c);
 			}
@@ -133,9 +134,9 @@ public class Arena {
 		return ans;
 	}
 	
-	public static ArrayList<CL_Pokemon> json2Pokemons(String fs) 
+	public static ArrayList<Pokemon> json2Pokemons(String fs) 
 	{
-		ArrayList<CL_Pokemon> ans = new  ArrayList<CL_Pokemon>();
+		ArrayList<Pokemon> ans = new  ArrayList<Pokemon>();
 		try {
 			JSONObject ttt = new JSONObject(fs);
 			JSONArray ags = ttt.getJSONArray("Pokemons");
@@ -146,7 +147,7 @@ public class Arena {
 				double v = pk.getDouble("value");
 				//double s = 0;//pk.getDouble("speed");
 				String p = pk.getString("pos");
-				CL_Pokemon f = new CL_Pokemon(new Point3D(p), t, v, 0, null);
+			   Pokemon f = new Pokemon(new Point3D(p), t, v, /*0,*/ null);
 				ans.add(f);
 			}
 		}
@@ -154,9 +155,10 @@ public class Arena {
 		return ans;
 	}
 	
-	public static void updateEdge(CL_Pokemon fr, directed_weighted_graph g) 
+	public static void updateEdge(Pokemon fr, directed_weighted_graph g) 
 	{
 		//	oop_edge_data ans = null;
+		if(fr!=null && g!= null) {
 		Iterator<node_data> itr = g.getV().iterator();
 		while(itr.hasNext()) {
 			node_data v = itr.next();
@@ -168,7 +170,7 @@ public class Arena {
 			}
 		}
 	}
-
+}
 	private static boolean isOnEdge(geo_location p, geo_location src, geo_location dest )
 	{
 
