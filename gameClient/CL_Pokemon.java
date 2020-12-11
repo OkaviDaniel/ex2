@@ -20,7 +20,9 @@ public class CL_Pokemon {
 		min_dist = -1;
 		min_ro = -1;
 	}
-	public static CL_Pokemon init_from_json(String json) {
+	
+	public static CL_Pokemon init_from_json(String json)
+	{
 		CL_Pokemon ans = null;
 		try
 		{
@@ -33,18 +35,23 @@ public class CL_Pokemon {
 		}
 		return ans;
 	}
-	public String toString() {return "F:{v="+_value+", t="+_type+"}";}
-	public edge_data get_edge() {
+	
+	public String toString() {return "F:{v="+ _value + ", t=" +_type + "}";}
+	public edge_data get_edge()
+	{
 		return _edge;
 	}
 
-	public void set_edge(edge_data _edge) {
+	public void set_edge(edge_data _edge) 
+	{
 		this._edge = _edge;
 	}
 
-	public Point3D getLocation() {
+	public Point3D getLocation()
+	{
 		return _pos;
 	}
+	
 	public int getType() {return _type;}
 //	public double getSpeed() {return _speed;}
 	public double getValue() {return _value;}

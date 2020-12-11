@@ -15,14 +15,14 @@ public class Pokemon
 	private Point3D pos;
 	private double min_dist;
 	private int min_ro;
-	private double speed;
+	//private double speed;
 	
-	public Pokemon(Point3D p, int t, double v, double s, edge_data e)
+	public Pokemon(Point3D p, int t, double v,/* double s,*/ edge_data e)
 	{
 		this.pos = p;
 		this.type = t;
 		this.value = v;
-		this.speed = s;
+		//this.speed = s;
 		edge = e;
 		min_dist = -1;
 		min_ro = -1;
@@ -42,7 +42,7 @@ public class Pokemon
 			double y1 = Double.parseDouble(arr[1]);
 			double z1 = Double.parseDouble(arr[2]);
 			Point3D pos1 = new Point3D(x1, y1, z1);
-			double speed1 = u.getDouble("speed");
+			//double speed1 = u.getDouble("speed");
 			JSONObject r = u.getJSONObject("edge");
 			int src1 = r.getInt("src");
 			int dest1 = r.getInt("dest");
@@ -50,7 +50,7 @@ public class Pokemon
 			double weight1 = r.getDouble("weight");
 			String info1 = r.getString("info");
 			EdgeData edge1 = new EdgeData(src1, dest1, tag1, weight1, info1);
-			return new Pokemon(pos1, type1, val1, speed1, edge1);
+			return new Pokemon(pos1, type1, val1, /*speed1,*/ edge1);
 		}
 		catch(Exception e) 
 		{
@@ -84,11 +84,12 @@ public class Pokemon
 		return type;
 	}
 	
+/*	
 	public double getSpeed() 
 	{
 		return speed;
 	}
-	
+*/
 	public double getValue() 
 	{
 		return value;
