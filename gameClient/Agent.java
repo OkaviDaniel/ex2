@@ -64,8 +64,11 @@ public class Agent {
 		}
 	}
 	
-	
-	public String toJSON() {
+	//******************* 			*****************************
+	//******************* to change *****************************
+	//******************* 			*****************************
+	public String toJSON() 
+	{
 		int d = this.getNextNode();
 		String ans = "{\"Agent\":{"
 				+ "\"id\":"+this.id+","
@@ -79,14 +82,17 @@ public class Agent {
 		return ans;	
 	}
 	
-	public int getSrcNode() {return this.curr_node.getKey();}
+	public int getSrcNode() 
+	{
+		return this.curr_node.getKey();
+	}
 	
 	public void setSpeed(int i) {
 		this.speed = i;
 	}
 
 
-	public void setMoney(int i) {
+	public void setMoney(double i) {
 		this.value = i;
 	}
 	

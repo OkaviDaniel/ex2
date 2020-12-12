@@ -11,6 +11,10 @@ import gameClient.util.Range2D;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,16 +25,26 @@ import java.util.List;
  * code and not to take it "as is".
  *
  */
-public class MyFrame extends JFrame{
+public class MyFrame extends JFrame implements MouseListener, MouseWheelListener{
 	
 	private int ind;
 	private Arena ar;
 	private gameClient.util.Range2Range w2f;
-
+	
+	
+	//For zoom panel
+	private double _zoom = 1d, _cZoom = 0.01, _minSize = 1;
+	private int midX, midY, pX, pY; 
+	
+	
+	
 	MyFrame(String a) {
 		super(a);
 		 ind = 0;
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		addMouseListener(this);
+		addMouseWheelListener(this);
+
 	}
 	
 	public void update(Arena ar) {
@@ -105,7 +119,7 @@ public class MyFrame extends JFrame{
 
 						geo_location fp = this.w2f.world2frame(c);
 						g.fillOval((int)fp.x()-r, (int)fp.y()-r, 2*r, 2*r);
-						g.drawString(""+f.getValue(), (int)fp.x(),(int)fp.y()-4*r);
+						//g.drawString(""+f.getValue(), (int)fp.x(),(int)fp.y()-4*r);
 
 					}
 				}
@@ -126,7 +140,6 @@ public class MyFrame extends JFrame{
 
 				geo_location fp = this.w2f.world2frame(c);
 				g.fillOval((int)fp.x()-r, (int)fp.y()-r, 2*r, 2*r);
-				g.drawString(""+ rs.get(i).getValue(), (int)fp.x(),(int)fp.y()-4*r);
 			}
 		}
 	}
@@ -147,5 +160,54 @@ public class MyFrame extends JFrame{
 		g.drawLine((int)s0.x(), (int)s0.y(), (int)d0.x(), (int)d0.y());
 //		geo_location average=new GeoLocation(x,);
 //		g.drawString(""+n.getKey(), fp.ix(), fp.iy()+2*r);
+	}
+
+	
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent arg0) {
+		Range rx = new Range(20,this.getWidth()-20);
+		Range ry = new Range(this.getHeight()-10,150);
+	//	Range2D frame = new Range2D(rx,ry);
+		int wheelRotation = arg0.getWheelRotation();
+		System.out.println("wheelRotation= " + wheelRotation);
+		double z = _zoom + wheelRotation * _cZoom;
+		int w = (int) (rx.get_length() * z);
+		int h = (int) (ry.get_length() * z);
+		if (w >= _minSize && h >= _minSize) {
+			_zoom = z;
+		}
+		repaint();
+		
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -22,12 +22,13 @@ public class Ex2_Client implements Runnable{
 		Thread client = new Thread(new Ex2_Client());
 		client.start();
 		
+		
 	}
 	
 	@Override
 	public void run()
 	{
-		int scenario_num = 8;
+		int scenario_num = 19;
 		game_service game = Game_Server_Ex2.getServer(scenario_num); // you have [0,23] games
 	//	int id = 999;
 	//	game.login(id);
@@ -37,7 +38,7 @@ public class Ex2_Client implements Runnable{
 		init(game);
 		
 		game.startGame();
-		_win.setTitle("Ex2 - OOP: (NONE trivial Solution) "+game.toString());
+		_win.setTitle("Ex2 - OOP: (trivial Solution) "+game.toString());
 		int ind=0;
 		long dt=100;
 		
@@ -72,10 +73,12 @@ public class Ex2_Client implements Runnable{
 	 */
 	private static void moveAgants(game_service game, directed_weighted_graph gg) 
 	{
+		
 		String lg = game.move();
 		List<Agent> log = Arena.getAgents(lg, gg);
 		_ar.setAgents(log);
 		//ArrayList<OOP_Point3D> rs = new ArrayList<OOP_Point3D>();
+		
 		String fs =  game.getPokemons();
 		List<Pokemon> ffs = Arena.json2Pokemons(fs);
 		_ar.setPokemons(ffs);
@@ -88,8 +91,9 @@ public class Ex2_Client implements Runnable{
 			double v = ag.getValue();
 			if(dest==-1) 
 			{
-				dest = nextNode(gg, src);
-				game.chooseNextEdge(ag.getID(), dest);
+				dest = nextNode(gg, src); 				//
+				game.chooseNextEdge(ag.getID(), dest);  //
+				System.out.println(game.getAgents());
 				System.out.println("Agent: "+id+", val: "+v+"   turned to node: "+dest);
 			}
 		}

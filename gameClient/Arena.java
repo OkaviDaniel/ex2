@@ -48,14 +48,16 @@ public class Arena {
 		this.pokemons = f;
 	}
 	
-	public void setAgents(List<Agent> f) {
+	public void setAgents(List<Agent> f) 
+	{
 		this.agents = f;
 	}
 	
 	public void setGraph(directed_weighted_graph g)
 	{
 		this.gg =g;
-	}//init();}
+		init();
+	}
 	
 	private void init() 
 	{
@@ -171,6 +173,7 @@ public class Arena {
 		}
 	}
 }
+	
 	private static boolean isOnEdge(geo_location p, geo_location src, geo_location dest )
 	{
 

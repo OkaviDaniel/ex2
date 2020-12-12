@@ -1,13 +1,22 @@
 package gameClient;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.google.gson.JsonElement;
+
 import Server.Game_Server_Ex2;
+import api.DWGraph_DS;
+import api.GeoLocation;
+import api.NodeData;
 import api.directed_weighted_graph;
 import api.edge_data;
 import api.game_service;
 import api.node_data;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * This class represents the simplest "Client-Game" main class
@@ -16,18 +25,21 @@ import java.util.List;
  * use of the "server".
  */
 public class SimpleGameClient {
-	public static void main(String[] a) {
+	public static void main(String[] a) 
+	{
 		test1();
 	}
-	public static void test1() {
+	
+	public static void test1()
+	{
 		game_service game = Game_Server_Ex2.getServer(2); // you have [0,23] games
-		String g = game.getGraph();
-		directed_weighted_graph gg = game.getJava_Graph_Not_to_be_used();
+		String g = game.getGraph();		
+		directed_weighted_graph gg = game.getJava_Graph_Not_to_be_used(); 
 		//game.login(12345);  // please use your ID only as a key. uncomment this will upload your results to the server
 		node_data nn = gg.getNode(10);
 		String info = game.toString();
 		System.out.println(info);
-		System.out.println(g);
+		System.out.println("----->"+g);
 		System.out.println(game.getPokemons());
 		int src_node = 0;  // arbitrary node, you should start at one of the fruits
 		game.addAgent(src_node);
@@ -37,6 +49,7 @@ public class SimpleGameClient {
 			long t = game.timeToEnd();
 			String lg = game.move();
 			List<Agent> log = Arena.getAgents(lg, gg);
+			//System.out.println(log);
 			for(int a=0;a< log.size();a++) {
 				Agent r = log.get(a);
 				int dest = r.getNextNode();
@@ -69,4 +82,43 @@ public class SimpleGameClient {
 		return ans;
 	}
 
+//	private directed_weighted_graph fromJsonToGraph(String json)
+//	{
+//		JSONObject jsonObj;
+//		try 
+//		{
+//			DWGraph_DS g = new DWGraph_DS();
+//			jsonObj = new JSONObject(json);
+//			JSONArray nodesEl = (JSONArray) jsonObj.get("Nodes");
+//			for(JsonElement i : nodesEl)
+//			{
+//				int id = i.getAsJsonObject().get("id").getAsInt();
+//				NodeData tmp = new NodeData(id);			
+//				String geoTmp = i.getAsJsonObject().get("pos").getAsString();
+//				String[] geoTmp2 = geoTmp.split(",");
+//				double x = Double.parseDouble(geoTmp2[0]);
+//				double y = Double.parseDouble(geoTmp2[1]);
+//				double z = Double.parseDouble(geoTmp2[2]);
+//				tmp.setLocation(new GeoLocation(x, y, z));				
+//				g.addNode(tmp);		
+//			}
+//			JsonElement edgesEl = (JsonElement) jsonObj.get("Edges");
+//			if(edgesEl.isJsonArray())
+//			{
+//				for(JsonElement i: edgesEl.getAsJsonArray())
+//				{
+//					int src = i.getAsJsonObject().get("src").getAsInt();
+//					int dest = i.getAsJsonObject().get("dest").getAsInt();
+//					double weight = i.getAsJsonObject().get("w").getAsDouble();
+//					g.connect(src, dest, weight);
+//				}
+//			}
+//			return g;
+//		}
+//		catch(Exception e) 
+//		{
+//			e.printStackTrace();
+//			return null;
+//		}	
+//	}
 }
