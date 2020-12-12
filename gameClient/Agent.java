@@ -37,41 +37,31 @@ public class Agent {
 	
 	
 	
-	public void update(String json) //ID?
-	{
-		try
-		{
-			JSONObject jsonObj = new JSONObject(json);
+	public void update(String json) {
+		JSONObject jsonObj;
+		try {
+			jsonObj = new JSONObject(json);
 			JSONObject agentObj = jsonObj.getJSONObject("Agent");
 			int id1 = agentObj.getInt("id");
-			if(id1 == this.id || id1 == -1)
-			{
-				if(this.id == -1)
-				{
-					this.id = id1;
-				}
-				//value == money
-				this.value = agentObj.getDouble("value");
-				//source
-				this.curr_node = gg.getNode(agentObj.getInt("src"));
-				//destination
+			if(id==this.getID() || this.getID() == -1) {
+				if(this.getID() == -1) {this.id = id1;}
+				double speed = agentObj.getDouble("speed");
+				int src = agentObj.getInt("src");
 				int dest = agentObj.getInt("dest");
-				this.setNextNode(dest);
-				//position
+				double value = agentObj.getDouble("value");
 				String p = agentObj.getString("pos");
 				Point3D pp = new Point3D(p);
 				GeoLocation tmp = new GeoLocation(pp.x(), pp.y(), pp.z());
 				pos = tmp;
-				//speed
-				this.speed = agentObj.getDouble("speed");	
+				this.setCurrNode(src);
+				this.setSpeed(speed);
+				this.setNextNode(dest);
+				this.setMoney(value);
 			}
-			
 		}
-		catch(Exception e)
-		{
+		catch(Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	
@@ -109,12 +99,10 @@ public class Agent {
 		if(curr_edge!=null) 
 		{
 			ans=true;
-			id = dest;
 		}
 		else 
 		{
 			curr_edge = null;
-			id =-1;
 		}
 		return ans;
 	}
