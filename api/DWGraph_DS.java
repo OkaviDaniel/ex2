@@ -18,6 +18,8 @@ public class DWGraph_DS implements directed_weighted_graph , Serializable{
 	private int edgeSiz=0;
 	private int mcCounter=0;
 	
+//	private long counter2=0;
+	
 	public DWGraph_DS()
 	{
 		this.pointers = new HashMap<Integer, Collection<node_data>> ();
@@ -282,6 +284,25 @@ public class DWGraph_DS implements directed_weighted_graph , Serializable{
 		return mcCounter;
 	}
 	
+	
+	public void changeDirections()
+	{
+		ArrayList<edge_data> edgeses = new ArrayList<edge_data>();
+		for(edge_data a : getEdges())
+		{
+			edgeses.add(a);
+		}
+		for(edge_data a:edgeses )
+		{
+			int src1 = a.getSrc();
+			int dest1 = a.getDest();
+			double w = a.getWeight();
+			removeEdge(src1, dest1);
+			connect(dest1, src1, w);
+		//	counter2++;
+		}
+		//System.out.println(counter2);
+	}
 		
 /////////////////////////internal class NodeData///////////////////////////////
 	

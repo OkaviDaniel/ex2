@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,11 +26,7 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	private static final long serialVersionUID = 1L;
 	private directed_weighted_graph g;
 	private int dijkstraCounter=0;
-	private int time;
-	private List<List<Integer>> components;
-	private int[] lowlink;
-	private Stack<node_data> stack;
-
+	private static long counter1 = 1;
 
 	//Default constructor
 	public DWGraph_Algo()
@@ -121,7 +118,6 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		}	
 	}
 
-
 	@Override
 	public boolean isConnected()
 	{	
@@ -139,35 +135,6 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	}		                                  //}                                     
 
 
-
-
-	public boolean connectedOrNot()
-	{
-		stack = new Stack<>();
-		time = 0;
-		lowlink = new int[g.getV().size()];
-		components = new ArrayList<>();
-		for(node_data u : g.getV())
-		{
-			if(!u.getInfo().equals("Visited"))
-			{
-				dfs(u);
-			}
-		}
-		if(components.size()==1)
-		{
-			
-			return true;
-		}
-		else
-		{
-			System.out.println(components);
-			return false;
-		}
-		
-	}
-	
-	
 	@Override
 	public double shortestPathDist(int src, int dest) {
 
@@ -258,13 +225,13 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		try {
 			GsonBuilder builder = new GsonBuilder();
 			builder.registerTypeAdapter(DWGraph_DS.class, new graphDeserializer());
-		//	builder.registerTypeAdapter(NodeData.class, new NodeDataInstanceCreator());
 			Gson gson = builder.create();
 			
 			FileReader reader = new FileReader(file);
+		//	System.out.println(reader);
 			DWGraph_DS a = gson.fromJson(reader,DWGraph_DS.class);
 			this.g = a;
-			System.out.println(a);
+			//System.out.println(a);
 			return true;
 		}catch(FileNotFoundException e) {
 			e.printStackTrace();
@@ -272,38 +239,103 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		}
 	}
 
-	private void dfs(node_data u)
+	public boolean connectedOrNot()
 	{
-		lowlink[u.getKey()] = time++;
-		u.setInfo("Visited");
-		stack.add(u);
-		boolean uIsComponentRoot = true;
-		for(node_data v : ((DWGraph_DS)g).getNi(u.getKey()))
+		if(g.getV().size()==0 || g.getV().size()==1)
 		{
-			if(!v.getInfo().equals("Visited"))
-			{
-				dfs(v);
-			}
-			if(lowlink[u.getKey()] > lowlink[v.getKey()])
-			{
-				lowlink[u.getKey()] = lowlink[v.getKey()];
-				uIsComponentRoot = false;
-			}		
+			return true;
 		}
-		
-		if(uIsComponentRoot)
+		else
 		{
-			List<Integer> component = new ArrayList<>();
-			while(true)
+			//Choose a random node
+			node_data a = g.getV().iterator().next();
+			//Run the bfs algo
+			bfs(a);
+			// counter1 is a static variable that count the number of the nodes that the bfs algo met on his run
+			if(counter1 == g.getV().size())
 			{
-				int x = stack.pop().getKey();
-				component.add(x);
-				lowlink[x] = Integer.MAX_VALUE;
-				if (x == u.getKey())
-					break;
+				// reset the counter to 1
+				counter1 = 1;
+				//Change the direction of the edges on the graph (O(n) when n is the number of vertices on the graph)
+				((DWGraph_DS)g).changeDirections();
+				// restore the nodes to their default state
+				restoreNodes();
+				//run the bfs algo on the same node
+				bfs(a);
+				//if the counter is still equals to the number of verices on the graph then:
+				if(counter1 == g.getV().size())
+				{
+					// restore the nodes and the counter to their default state
+					restoreNodes();
+					counter1 = 1;
+					// change back the edges on the graph
+					((DWGraph_DS)g).changeDirections();
+					return true;
+				}
+				else
+				{
+					//If we got here then the bfs algo on the changed graph didn't met all the nodes on the graph
+					//So restore all the nodes and the edges and the counter to their default state
+					restoreNodes();
+					counter1 = 1;
+					((DWGraph_DS)g).changeDirections();
+					restoreNodes();
+					return false;
+				}
 			}
-			components.add(component);
+			else
+			{
+				//In this case the first run of the bfs algo didn't met all the nodes on the graph
+				counter1 = 1;
+				restoreNodes();
+				return false;
+			}
 		}
 	}
+	
+	
+	private void bfs(node_data src)
+	{
+		if(g.getV().contains(src))
+		{
+			LinkedList<node_data> q = new LinkedList<node_data>();
+			src.setInfo("Visited");
+			q.add(src);		
+			while(!q.isEmpty()) {
+				node_data temp = q.removeFirst();			
+				Collection<node_data> ni = ((DWGraph_DS)g).getNi(temp.getKey());
+				for(node_data f : ni)
+				{
+					if(!f.getInfo().equals("Visited"))
+					{						
+						f.setInfo("Visited");
+						q.add(f);	
+						counter1++;
+					}
+				}
+			}
+		}
+		//System.out.println("This is the counter: " + counter1);
+		
+	}
+	private void restoreNodes()
+	{
+		if(g.getV().size()>0)
+		{
+			Iterator<node_data> f = g.getV().iterator();
+			while(f.hasNext())
+			{
+				node_data temp = f.next();
+				if(!temp.getInfo().equals("NotVisited"))
+				{
+					temp.setInfo("NotVisited");
+				}
+			}
+		}
+	}
+	
+	
+
+
 }
 
