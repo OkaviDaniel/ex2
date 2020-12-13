@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Stack;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,17 +29,26 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	private directed_weighted_graph g;
 	private int dijkstraCounter=0;
 	private static long counter1 = 1;
+	//For tarjanAlgorithm only--v--
+	private int time=0;
+	private ArrayList<ArrayList<Integer>> components;
+	private ArrayList<Integer> lowlink;
+	private Stack<node_data> stack;
 
 	//Default constructor
 	public DWGraph_Algo()
 	{
+		this.stack = new Stack<node_data>();
 		this.g = new DWGraph_DS();
+		this.lowlink = new ArrayList<Integer>();
+		this.components = new ArrayList<ArrayList<Integer>>();
 	}	
 
 	@Override
 	public void init(directed_weighted_graph g)
 	{
-		this.g = (DWGraph_DS)g;
+		//this.g = (DWGraph_DS)g;
+		this.g = g;
 	}
 
 	@Override
@@ -335,7 +346,86 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	}
 	
 	
+	public void tarjan(node_data u)
+	{
+		int tmp = time++;
+		lowlink.set(u.getKey(),tmp) ;
+		u.setInfo("Visited");
+		stack.add(u);
+		boolean uIsComponentRoot = true;
+		for(node_data v : ((DWGraph_DS)g).getNi(u.getKey()))
+		{
+			if(!v.getInfo().equals("Visited"))
+			{
+				tarjan(v);
+			}
+			if(lowlink.get(u.getKey()) > lowlink.get(v.getKey()))
+			{
+				lowlink.set(u.getKey(), v.getKey());
+				uIsComponentRoot = false;
+			}		
+		}
+		
+		if(uIsComponentRoot)
+		{
+			ArrayList<Integer> component = new ArrayList<>();
+			while(true)
+			{
+				int x = stack.pop().getKey();
+				component.add(x);
+				lowlink.set(x, Integer.MAX_VALUE);
+				if (x == u.getKey())
+					break;
+			}
+			components.add(component);
+		}
+	}
 
-
+	public ArrayList<ArrayList<Integer>> getComp()
+	{
+		return components;
+	}
+	
+	public directed_weighted_graph fromJsonToGraph(String json)
+	{
+		JSONObject jsonObj;
+		try 
+		{
+			DWGraph_DS g = new DWGraph_DS();
+			jsonObj = new JSONObject(json);
+			JSONArray nodesEl = (JSONArray) jsonObj.get("Nodes");
+			for(int i = 0; i<nodesEl.length();i++)
+			{
+				JSONObject tmp1 = nodesEl.getJSONObject(i);
+				int id = tmp1.getInt("id");
+				NodeData n1 = new NodeData(id);
+				String geoTmp = tmp1.getString("pos");
+				String[] geoTmp2 = geoTmp.split(",");
+				double x = Double.parseDouble(geoTmp2[0]);
+				double y = Double.parseDouble(geoTmp2[1]);
+				double z = Double.parseDouble(geoTmp2[2]);
+				n1.setLocation(new GeoLocation(x, y, z));				
+				g.addNode(n1);
+				
+			}			
+			
+			JSONArray edgesEl = (JSONArray) jsonObj.get("Edges");
+		
+			for(int i = 0; i<edgesEl.length();i++)
+			{
+				JSONObject tmp2 = edgesEl.getJSONObject(i);
+				int src = tmp2.getInt("src");
+				int dest = tmp2.getInt("dest");
+				double weight = tmp2.getDouble("w");
+				g.connect(src, dest, weight);		
+			}
+			return g;
+		}
+		catch(Exception e) 
+		{
+			e.printStackTrace();
+			return null;
+		}	
+	}
 }
 
