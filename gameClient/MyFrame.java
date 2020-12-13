@@ -38,13 +38,11 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 	
 	
 	
-	MyFrame(String a) {
+	MyFrame(String a) 
+	{
 		super(a);
 		 ind = 0;
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		addMouseListener(this);
-		addMouseWheelListener(this);
-
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
 	}
 	
 	public void update(Arena ar) {
@@ -53,6 +51,7 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 	}
 
 	private void updateFrame() {
+		
 		Range rx = new Range(20,this.getWidth()-20);
 		Range ry = new Range(this.getHeight()-10,150);
 		Range2D frame = new Range2D(rx,ry);
@@ -114,12 +113,12 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 					Point3D c = f.getLocation();
 					int r=10;
 					g.setColor(Color.green);
-					if(f.getType()<0) {g.setColor(Color.yellow);}
+					if(f.getType()<0) {g.setColor(Color.ORANGE);}
 					if(c!=null) {
 
 						geo_location fp = this.w2f.world2frame(c);
 						g.fillOval((int)fp.x()-r, (int)fp.y()-r, 2*r, 2*r);
-						//g.drawString(""+f.getValue(), (int)fp.x(),(int)fp.y()-4*r);
+						g.drawString(""+f.getValue(), (int)fp.x(),(int)fp.y()-3*r);
 
 					}
 				}
@@ -162,25 +161,6 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 //		g.drawString(""+n.getKey(), fp.ix(), fp.iy()+2*r);
 	}
 
-	
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent arg0) {
-		Range rx = new Range(20,this.getWidth()-20);
-		Range ry = new Range(this.getHeight()-10,150);
-	//	Range2D frame = new Range2D(rx,ry);
-		int wheelRotation = arg0.getWheelRotation();
-		System.out.println("wheelRotation= " + wheelRotation);
-		double z = _zoom + wheelRotation * _cZoom;
-		int w = (int) (rx.get_length() * z);
-		int h = (int) (ry.get_length() * z);
-		if (w >= _minSize && h >= _minSize) {
-			_zoom = z;
-		}
-		repaint();
-		
-	}
-
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
@@ -210,4 +190,11 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

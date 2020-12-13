@@ -1,5 +1,8 @@
 package gameClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONObject;
 
 import api.GeoLocation;
@@ -25,6 +28,9 @@ public class Agent {
 	private double value;
 	
 	
+	private List<Integer> currentComp;
+	//public int indexOnTheComp;
+	
 	public Agent(directed_weighted_graph g, int start_node) 
 	{
 		gg = g;
@@ -33,9 +39,20 @@ public class Agent {
 		pos = curr_node.getLocation();
 		id = -1;
 		this.speed = 0;
+		currentComp = new ArrayList<Integer>(); //??
 	}
 	
-	
+	// a new constructor with component
+	public Agent(directed_weighted_graph g, int start_node, List<Integer> comp) 
+	{
+		gg = g;
+		this.value = 0; // val == money
+		this.curr_node = gg.getNode(start_node);
+		pos = curr_node.getLocation();
+		id = -1;
+		this.speed = 0;
+		this.currentComp = comp;
+	}
 	
 	public void update(String json) {
 		JSONObject jsonObj;
@@ -80,6 +97,16 @@ public class Agent {
 				+ "}"
 				+ "}";
 		return ans;	
+	}
+	
+	public List<Integer> getComp()
+	{
+		return currentComp;
+	}
+	
+	public void setComp(List<Integer> l)
+	{
+		this.currentComp = l;
 	}
 	
 	public int getSrcNode() 
