@@ -30,24 +30,22 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	private int dijkstraCounter=0;
 	private static long counter1 = 1;
 	//For tarjanAlgorithm only--v--
-	private int time=0;
-	private ArrayList<ArrayList<Integer>> components;
-	private ArrayList<Integer> lowlink;
+	private int time;
+	private List<List<Integer>> components;
+	private int[] lowlink;
 	private Stack<node_data> stack;
 
 	//Default constructor
 	public DWGraph_Algo()
 	{
-		this.stack = new Stack<node_data>();
 		this.g = new DWGraph_DS();
-		this.lowlink = new ArrayList<Integer>();
-		this.components = new ArrayList<ArrayList<Integer>>();
 	}	
 
 	@Override
 	public void init(directed_weighted_graph g)
 	{
 		//this.g = (DWGraph_DS)g;
+	
 		this.g = g;
 	}
 
@@ -88,7 +86,7 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 
 
 
-	private void Dijkstra(directed_weighted_graph graph, node_data source) {
+	public void Dijkstra(directed_weighted_graph graph, node_data source) {
 
 		Collection<node_data> nodeInfoArrayList = graph.getV();
 
@@ -195,15 +193,26 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		{
 			json1 = json1 + e.toJson() + ",";
 		}
+		
 		//Getting rid of the last ','
-		int tmp1 = json1.length();
 		String json2 = "";
-		for(int i = 0; i<tmp1-1;i++)
+		if(!(json1.charAt(json1.length()-1)=='['))
 		{
-			json2 = json2 + json1.charAt(i);
+			int tmp1 = json1.length();
+			
+			for(int i = 0; i<tmp1-1;i++)
+			{
+				json2 = json2 + json1.charAt(i);
+			}
+			json2 = json2 + "],";
 		}
-		//and then adding the '],'
-		json2 = json2 + "],";
+		else
+		{
+			//There are no edges, then just add "],"
+			json2 = json1 + "],";
+		}
+			
+		
 		
 		//For nodes
 		String json3 = "\"Nodes\":[";
@@ -213,15 +222,26 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		}
 		int tmp2=json3.length();
 		String json4 = "";
-		for (int i = 0; i < tmp2-1; i++) {
-			json4 = json4 + json3.charAt(i);
+		
+		if(!(json3.charAt(json3.length()-1)=='['))
+		{
+			for (int i = 0; i < tmp2-1; i++) {
+				json4 = json4 + json3.charAt(i);
+			}
+			json4 = json4 + "]}";
 		}
-		json4 = json4 + "]}";
+		else
+		{
+			//There are no nodes, then just add "]}"
+			json4 = json3 + "]}";
+		}
+		
 		String ans = json2 + json4;
 		
 		try {
 			PrintWriter aw = new PrintWriter(new File(file));
 			aw.write(ans);
+			//System.out.println(ans);
 			aw.close();
 			return true;
 		}catch(FileNotFoundException e){
@@ -346,10 +366,9 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	}
 	
 	
-	public void tarjan(node_data u)
+	public void dfs(node_data u)
 	{
-		int tmp = time++;
-		lowlink.set(u.getKey(),tmp) ;
+		lowlink[u.getKey()] = time++;
 		u.setInfo("Visited");
 		stack.add(u);
 		boolean uIsComponentRoot = true;
@@ -357,34 +376,74 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		{
 			if(!v.getInfo().equals("Visited"))
 			{
-				tarjan(v);
+				dfs(v);
 			}
-			if(lowlink.get(u.getKey()) > lowlink.get(v.getKey()))
+			if(lowlink[u.getKey()] > lowlink[v.getKey()])
 			{
-				lowlink.set(u.getKey(), v.getKey());
+				lowlink[u.getKey()] = lowlink[v.getKey()];
 				uIsComponentRoot = false;
 			}		
 		}
 		
 		if(uIsComponentRoot)
 		{
-			ArrayList<Integer> component = new ArrayList<>();
+			List<Integer> component = new ArrayList<>();
 			while(true)
 			{
 				int x = stack.pop().getKey();
 				component.add(x);
-				lowlink.set(x, Integer.MAX_VALUE);
+				lowlink[x] = Integer.MAX_VALUE;
 				if (x == u.getKey())
 					break;
 			}
 			components.add(component);
 		}
 	}
-
-	public ArrayList<ArrayList<Integer>> getComp()
+	
+	
+	public List<List<Integer>> tarjan()
 	{
-		return components;
+		stack = new Stack<>();
+		time = 0;
+		lowlink = new int[g.getV().size()];
+		components = new ArrayList<>();
+		for(node_data u : g.getV())
+		{
+			if(!u.getInfo().equals("Visited"))
+			{
+				dfs(u);
+			}
+		}
+		if(components.size()==1)
+		{
+			
+			System.out.println("true");
+			restoreNodes();
+			return components;
+		}
+		else
+		{
+			restoreNodes();
+			System.out.println("false");
+			return components;
+		}
+		
 	}
+	
+	public List<List<Integer>> getComp()
+	{
+		if(components!=null)
+		{
+			return components;
+		}
+		else
+		{
+			List<List<Integer>> tmp = tarjan();
+			restoreNodes();
+			return tmp;
+		}
+	}
+	
 	
 	public directed_weighted_graph fromJsonToGraph(String json)
 	{
