@@ -186,72 +186,69 @@ public class Ex2_Client implements Runnable{
 					}
 				}
 			}
-			System.out.println(gPfC);
+			//System.out.println(gPfC);
 			
-			int counterForAgents = 0;
-			if(this.comps.size()==1){
+			int counterForAgents = 0;	
+			if(this.comps.size()==1){// If the number of components is equals to 1
 				if(numOfAgents<=pokemons.size()){
+					// If the number of agents <= number of pokemons
 					for(int i =0;i<pokemons.size();i++){				
-						game.addAgent(pokemons.get(i).get_edge().getSrc());
-						_ar.setAgents(Arena.getAgents(game.getAgents(), g));
-						pokemons.get(i).setTaken(true);
-						if((counterForAgents++) == numOfAgents) break;		
+						game.addAgent(pokemons.get(i).get_edge().getSrc());//add each agent to the game near the pokemon[i]
+						_ar.setAgents(Arena.getAgents(game.getAgents(), g));// updating the arena with the changes
+						pokemons.get(i).setTaken(true);//The pokemon[i] is taken by agent so set pokmon[i].taken to be true
+						if((counterForAgents++) == numOfAgents) break;// if the number of the agent counter is equals to the number of agents then break
 					}				
-				}//The case when there are more agents than pokemons
+				}//else the number of agents > number of pokemons
 				else
 				{
 					for(;counterForAgents<numOfAgents;counterForAgents++){
-						if(counterForAgents<=pokemons.size()){
-							game.addAgent(pokemons.get(counterForAgents).get_edge().getSrc());
-							_ar.setAgents(Arena.getAgents(game.getAgents(), g));	
-							pokemons.get(counterForAgents).setTaken(true);
+						//for each agent
+						if(counterForAgents<=pokemons.size()){//If the number of the counter of agents < number of pokemons						
+							game.addAgent(pokemons.get(counterForAgents).get_edge().getSrc());//add a new agent to the graph near the pokemon[counterForAgents]
+							_ar.setAgents(Arena.getAgents(game.getAgents(), g));//	updating the arena with the changes
+							pokemons.get(counterForAgents).setTaken(true);//The pokemon[counterForAgents] is taken by agent so set pokmon[counterForAgents].taken to be true
 						}else{
-							game.addAgent(pokemons.get((counterForAgents%(pokemons.size()))).get_edge().getSrc());//instead of pokemon it sould be pokCounter
-							_ar.setAgents(Arena.getAgents(game.getAgents(), g));
-							pokemons.get((counterForAgents%(pokemons.size()))).setTaken(true);
+							game.addAgent(pokemons.get((counterForAgents%(pokemons.size()))).get_edge().getSrc());//same as above, just to not get out of index, we use the modulo operation 
+							_ar.setAgents(Arena.getAgents(game.getAgents(), g));// same as above
+							pokemons.get((counterForAgents%(pokemons.size()))).setTaken(true);//same as above
 						}
 					}
 				}
 			}
 			
-			else if(this.comps.size() > 1)
-			{
-				if(numOfAgents == this.comps.size())
-				{
-					for(counterForAgents = 0; counterForAgents<numOfAgents; counterForAgents++) // <=?
-					{
-						int mx1 = findMaxIndex2(pokCounter);
-						if(mx1!=-1) //That means we have an index that lead us to the max
-						{
-							// if the component with the max pokemons have one node then:
-							if(comps.get(mx1).size()==1)
-							{
-								pokCounterTaken[mx1]=true;	//Assume we already put an agent in there to not calculate it
-								counterForAgents--;
-							}else if(comps.get(mx1).size()>1){//In the component there is more than one node
-								
-								for(int i =0; i < gPfC.get(mx1).size();i++){//for every pokemon in that component
-									
-									if(gPfC.get(mx1).get(i).isTaken()==false){//if the the pokemon[i] in the component is not taken by someone than
+			else if(this.comps.size() > 1){// The case when the number of components > 1 (The graph is not connected)
+				
+				if(numOfAgents == this.comps.size()){// If the number of agents = number of components
+					for(counterForAgents = 0; counterForAgents<numOfAgents; counterForAgents++) // <=?				
+					{//for each agent						
+						int mx1 = findMaxIndex2(pokCounter); // find the the maximum (index) on pokCounter array - (that array contains the number of pokemons on each component)
+						if(mx1!=-1){// if the index that returned is not equals to -1: That means we have an index that lead us to the component that contains the most pokemons that don't have any agent.										
+							if(comps.get(mx1).size()==1){// if the component with the max pokemons have one node then:												
+								pokCounterTaken[mx1]=true;	//We will pass that component because there is no point to put an agent on that component
+								counterForAgents--;//reduce the counter because we didn't put any agent on the arena				
+							}else if(comps.get(mx1).size()>1){//If the component have more than one node				
+								for(int i =0; i < gPfC.get(mx1).size();i++){//for every pokemon in the component with the biggest num of pokemons, we need to find a "free pokemon"				
+									if(gPfC.get(mx1).get(i).isTaken()==false){//if the pokemon[i] in the component is not taken by agent then
 										
-										game.addAgent(gPfC.get(mx1).get(i).get_edge().getSrc());
-										_ar.setAgents(Arena.getAgents(game.getAgents(), g));
-										gPfC.get(mx1).get(i).setTaken(true);
-										pokCounter[mx1]--;
-									}//else do nothing ****for now****
+										pokCounterTaken[mx1]=true;// we took a pokemon from that component
+										game.addAgent(gPfC.get(mx1).get(i).get_edge().getSrc());//Add the agent to the game on the source vertex of the pokemon
+										_ar.setAgents(Arena.getAgents(game.getAgents(), g));// update the arena
+										gPfC.get(mx1).get(i).setTaken(true);//set the pokemon[i] on the comps[mx1] to be taken
+										pokCounter[mx1]--;// decrease the number of pokemons on the pokCounter[mx1]
+										break;//and break because we found a pokemon on that component that we can add an agent close to it						
+									}
 								}
 							}			
-						}
+						}//else mx1 = -1, that means that we already put agents in all the "biggest" components and still we have more agents in our hand
 						else
 						{
-							setFree();
-							mx1 = findMaxIndex(pokCounter);
-							while(counterForAgents<numOfAgents){//
+							setFree(); // so change back the pokCounterTaken to normal
+							mx1 = findMaxIndex(pokCounter); // find the new maximum on the pokCounter array
+							while(counterForAgents<numOfAgents){//While the number of the counter of agents < number of agents
 								
-								if(pokCounter[mx1] > 0){								
-									for (int i = 0; i < comps.get(mx1).size(); i++) {
-										if(gPfC.get(mx1).get(i).isTaken()==false)
-										{
+								if(pokCounter[mx1] > 0){//Maybe this if is irrelevant but if the number of pokemons on that component			
+									for (int i = 0; i < comps.get(mx1).size(); i++) {// for every pokemon on that component
+										if(gPfC.get(mx1).get(i).isTaken()==false){// if the pokemon is not taken
 											game.addAgent(gPfC.get(mx1).get(i).get_edge().getSrc());
 											_ar.setAgents(Arena.getAgents(game.getAgents(), g));
 											gPfC.get(mx1).get(i).setTaken(true);
@@ -259,30 +256,31 @@ public class Ex2_Client implements Runnable{
 											counterForAgents++;
 										}
 									}
+									while(counterForAgents<numOfAgents)//if we added for each pokemon on that component an agent and still have more agents, then add them to the pokemons randomly
+									{
+										game.addAgent((gPfC.get(mx1).get(counterForAgents%pokCounter[mx1]).get_edge().getSrc())); //add agent to a "randnom" pokemon
+										_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+										counterForAgents++;
+									}
 								}
 							}
-						}
-						
+						}			
 						
 					}
 				}else if(numOfAgents < this.comps.size())
 				{
 					counterForAgents=0;
-					while(counterForAgents<numOfAgents)
-					{
+					while(counterForAgents<numOfAgents){
+						
 						int mx1 = findMaxIndex2(pokCounter);
-						if(mx1>-1)
-						{
-							if(comps.get(mx1).size()<=1)
-							{
+						if(mx1>-1){
+							if(comps.get(mx1).size()<=1){
 								pokCounterTaken[mx1]=true;								
 							}else
 							{
 								ArrayList<Pokemon> tmp = gPfC.get(mx1);						
-								for(int i =0; i<tmp.size();i++)
-								{
-									if(tmp.get(i).isTaken()==false)
-									{
+								for(int i =0; i<tmp.size();i++){
+									if(tmp.get(i).isTaken()==false){
 										game.addAgent(tmp.get(i).get_edge().getSrc());
 										_ar.setAgents(Arena.getAgents(game.getAgents(), g));
 										tmp.get(i).setTaken(true);
@@ -298,9 +296,8 @@ public class Ex2_Client implements Runnable{
 						{
 							setFree();
 							mx1 = findMaxIndex2(pokCounter);
-							while(counterForAgents<numOfAgents)
-							{
-								if(pokCounter[mx1] > 0)
+							while(counterForAgents<numOfAgents){
+								if(pokCounter[mx1] > 0)	// if the number of the pokemons on the current component is greater than zero
 								{
 									for (int i = 0; i < comps.get(mx1).size(); i++) {
 										if(gPfC.get(mx1).get(i).isTaken()==false){
@@ -327,17 +324,12 @@ public class Ex2_Client implements Runnable{
 						int mx1 = findMaxIndex2(pokCounter);
 						if(mx1 > -1)	//That means we didn't put in all the components agents
 						{
-							if(comps.get(mx1).size()<=1)
-							{
+							if(comps.get(mx1).size()<=1){
 								pokCounterTaken[mx1]=true;								
-							}else
-							{
-								for(int j = 0; j<gPfC.get(mx1).size();j++)
-								{
-									if(counterForAgents<numOfAgents)									
-									{
-										if(gPfC.get(mx1).get(j).isTaken()==false)
-										{
+							}else{
+								for(int j = 0; j<gPfC.get(mx1).size();j++){
+									if(counterForAgents<numOfAgents){
+										if(gPfC.get(mx1).get(j).isTaken()==false){
 											game.addAgent(gPfC.get(mx1).get(j).get_edge().getSrc());
 											_ar.setAgents(Arena.getAgents(game.getAgents(), g));
 											gPfC.get(mx1).get(j).setTaken(true);	
@@ -349,7 +341,7 @@ public class Ex2_Client implements Runnable{
 									}	
 								}
 							}						
-						}else {
+						}else{
 							
 							
 						}
