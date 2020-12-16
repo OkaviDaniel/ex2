@@ -20,13 +20,13 @@ public class Ex2_Client implements Runnable{
 	private static Arena _ar;
 	private static long id;
 	private static int scenario;
-	
-	
+
+
 	private HashMap <Integer, ArrayList<Pokemon>> gPfC; // get pokemon from components (each Integer is index of component from the variable comps)
 	private boolean[] pokCounterTaken;					// check if we already put an agent on the game
 	private List<List<Integer>> comps;
 	private HashMap<Integer,List<Integer>> components;
-	
+
 	public static void main(String[] a) 
 	{
 		Thread client = new Thread(new Ex2_Client());
@@ -34,28 +34,28 @@ public class Ex2_Client implements Runnable{
 		//id = Long.parseLong(a[0]);
 		//scenario = Integer.parseInt(a[1]);
 	}
-	
+
 	@Override
 	public void run()
 	{
-		int scenario_num = 1;
+		int scenario_num = 23;
 		game_service game = Game_Server_Ex2.getServer(scenario_num); // you have [0,23] games
-	//	int id = 999;
-	//	game.login(id);
-		
+		//	int id = 999;
+		//	game.login(id);
+
 		// getting the graph
 		String g = game.getGraph();
 		DWGraph_Algo ga = new DWGraph_Algo();
 		directed_weighted_graph gg = ga.fromJsonToGraph(g);
 
 		this.components = new HashMap<Integer, List<Integer>>();
-		
+
 		//String pks = game.getPokemons();
 		init(game);
-		
+
 		game.startGame();
 		_win.setTitle("Ex2 - OOP: "+game.toString());
-		
+
 		int ind=0;
 		long dt=100;
 		//every 0.1 seconds
@@ -80,7 +80,7 @@ public class Ex2_Client implements Runnable{
 		System.out.println(res);
 		System.exit(0);
 	}
-	
+
 	/** 
 	 * Moves each of the agents along the edge,
 	 * in case the agent is on a node the next destination (next edge) is chosen (randomly).
@@ -122,10 +122,10 @@ public class Ex2_Client implements Runnable{
 	 */
 	private static int nextNode(directed_weighted_graph g, int src)
 	{
-		
+
 		int ans = -1;
 		Collection<edge_data> ee = g.getE(src);
-	
+
 		Iterator<edge_data> itr = ee.iterator();
 		int s = ee.size();
 		int r = (int)(Math.random()*s);
@@ -137,14 +137,14 @@ public class Ex2_Client implements Runnable{
 		ans = itr.next().getDest();
 		return ans;
 	}
-	
+
 	///////////////////Init//////////////////
 	private void init(game_service game) {
 		String jsonG = game.getGraph();
 		DWGraph_Algo ga = new DWGraph_Algo();
 		directed_weighted_graph g = ga.fromJsonToGraph(jsonG);
 		ga.init(g);
-		
+
 		String fs = game.getPokemons();
 		_ar = new Arena();
 		_ar.setGraph(g);
@@ -153,7 +153,7 @@ public class Ex2_Client implements Runnable{
 		_win.setSize(1000, 700);
 		_win.update(_ar);
 		_win.show();
-		
+
 		String info = game.toString();
 		JSONObject jsonObj;
 		try {
@@ -162,7 +162,7 @@ public class Ex2_Client implements Runnable{
 			JSONObject gameServerObj = jsonObj.getJSONObject("GameServer");
 			//getting the number of agents of the current game
 			int numOfAgents = gameServerObj.getInt("agents");		
-			
+
 			gPfC = new HashMap<Integer, ArrayList<Pokemon>>();
 			ArrayList<Pokemon> pokemons = Arena.json2Pokemons(game.getPokemons());
 			for(int a = 0;a<pokemons.size();a++) { Arena.updateEdge(pokemons.get(a),g);} //Updating the arena with the pokemons and the graph	
@@ -187,7 +187,7 @@ public class Ex2_Client implements Runnable{
 				}
 			}
 			//System.out.println(gPfC);
-			
+
 			int counterForAgents = 0;	
 			if(this.comps.size()==1){// If the number of components is equals to 1
 				if(numOfAgents<=pokemons.size()){
@@ -215,10 +215,11 @@ public class Ex2_Client implements Runnable{
 					}
 				}
 			}
-			
+
 			else if(this.comps.size() > 1){// The case when the number of components > 1 (The graph is not connected)
-				
-				if(numOfAgents == this.comps.size()){// If the number of agents = number of components
+
+				if(numOfAgents == this.comps.size())// If the number of agents = number of components
+				{
 					for(counterForAgents = 0; counterForAgents<numOfAgents; counterForAgents++) // <=?				
 					{//for each agent						
 						int mx1 = findMaxIndex2(pokCounter); // find the the maximum (index) on pokCounter array - (that array contains the number of pokemons on each component)
@@ -229,10 +230,11 @@ public class Ex2_Client implements Runnable{
 							}else if(comps.get(mx1).size()>1){//If the component have more than one node				
 								for(int i =0; i < gPfC.get(mx1).size();i++){//for every pokemon in the component with the biggest num of pokemons, we need to find a "free pokemon"				
 									if(gPfC.get(mx1).get(i).isTaken()==false){//if the pokemon[i] in the component is not taken by agent then
-										
+
 										pokCounterTaken[mx1]=true;// we took a pokemon from that component
 										game.addAgent(gPfC.get(mx1).get(i).get_edge().getSrc());//Add the agent to the game on the source vertex of the pokemon
 										_ar.setAgents(Arena.getAgents(game.getAgents(), g));// update the arena
+										/*maybe not?*/	pokCounterTaken[mx1]=true;//set the component as taken
 										gPfC.get(mx1).get(i).setTaken(true);//set the pokemon[i] on the comps[mx1] to be taken
 										pokCounter[mx1]--;// decrease the number of pokemons on the pokCounter[mx1]
 										break;//and break because we found a pokemon on that component that we can add an agent close to it						
@@ -245,10 +247,10 @@ public class Ex2_Client implements Runnable{
 							setFree(); // so change back the pokCounterTaken to normal
 							mx1 = findMaxIndex(pokCounter); // find the new maximum on the pokCounter array
 							while(counterForAgents<numOfAgents){//While the number of the counter of agents < number of agents
-								
+
 								if(pokCounter[mx1] > 0){//Maybe this if is irrelevant but if the number of pokemons on that component			
 									for (int i = 0; i < comps.get(mx1).size(); i++) {// for every pokemon on that component
-										if(gPfC.get(mx1).get(i).isTaken()==false){// if the pokemon is not taken
+										if(gPfC.get(mx1).get(i).isTaken()==false){// if the pokemon is not taken add an agent near it
 											game.addAgent(gPfC.get(mx1).get(i).get_edge().getSrc());
 											_ar.setAgents(Arena.getAgents(game.getAgents(), g));
 											gPfC.get(mx1).get(i).setTaken(true);
@@ -265,37 +267,37 @@ public class Ex2_Client implements Runnable{
 								}
 							}
 						}			
-						
+
 					}
-				}else if(numOfAgents < this.comps.size())
-				{
+				}else if(numOfAgents < this.comps.size()){ //if the number of agents < number of the components
+
 					counterForAgents=0;
-					while(counterForAgents<numOfAgents){
-						
-						int mx1 = findMaxIndex2(pokCounter);
-						if(mx1>-1){
-							if(comps.get(mx1).size()<=1){
-								pokCounterTaken[mx1]=true;								
-							}else
-							{
-								ArrayList<Pokemon> tmp = gPfC.get(mx1);						
-								for(int i =0; i<tmp.size();i++){
+					while(counterForAgents<numOfAgents){//while the counter of the agents < the number of agents
+
+						int mx1 = findMaxIndex2(pokCounter);// mx1 is equals to the maximum index of the component that contains the most pokemons on the graph
+						if(mx1>-1){//if there is a component with no agent
+							if(comps.get(mx1).size()<=1){ // if the size of that component is equals to 1 - skip it
+								pokCounterTaken[mx1]=true;//That's how we skip it				
+							}else{
+								//else mx1 is equals to specific index 
+								ArrayList<Pokemon> tmp = gPfC.get(mx1);			//get the pokemons from that component			
+								for(int i =0; i<tmp.size();i++){				// searching for pokemon that is not taken
 									if(tmp.get(i).isTaken()==false){
-										game.addAgent(tmp.get(i).get_edge().getSrc());
-										_ar.setAgents(Arena.getAgents(game.getAgents(), g));
-										tmp.get(i).setTaken(true);
-										pokCounterTaken[mx1]=true;
-										pokCounter[mx1]--;
-										counterForAgents++;	
-										break;
+										game.addAgent(tmp.get(i).get_edge().getSrc());	//add that pokemon to the graph
+										_ar.setAgents(Arena.getAgents(game.getAgents(), g));// update the arena
+										tmp.get(i).setTaken(true);// set the pokemon as taken
+										pokCounterTaken[mx1]=true;//set the component as taken
+										pokCounter[mx1]--;//reduce the number of pokemons on that component
+										counterForAgents++;	//agents counter + 1
+										break;//break to move to another pokemon and component
 									}
 								}							
 							}
 						}
-						else//mx1==-1 that mean we already put in all the components that bigger than 1 an agent
+						else//mx1==-1 that mean we already put in all the components (that bigger than 1) an agent
 						{
-							setFree();
-							mx1 = findMaxIndex2(pokCounter);
+							setFree();//change back the pokCounterTaken to normal
+							mx1 = findMaxIndex2(pokCounter);// find the new maximum on the pokCounter array
 							while(counterForAgents<numOfAgents){
 								if(pokCounter[mx1] > 0)	// if the number of the pokemons on the current component is greater than zero
 								{
@@ -316,19 +318,19 @@ public class Ex2_Client implements Runnable{
 							}
 						}
 					}
-				}else if(numOfAgents > this.comps.size())
-				{
+				}else if(numOfAgents > this.comps.size()){ // if the number of agents > the number of components
+
 					counterForAgents=0;
-					for(int i =0; i<this.comps.size();i++)
+					for(int i =0; i<this.comps.size();i++) // for every component
 					{
-						int mx1 = findMaxIndex2(pokCounter);
-						if(mx1 > -1)	//That means we didn't put in all the components agents
+						int mx1 = findMaxIndex2(pokCounter);// find the maximum index of the component that have the most pokemons
+						if(mx1 > -1)//if there is a component with no agent
 						{
-							if(comps.get(mx1).size()<=1){
+							if(comps.get(mx1).size()<=1){// if the size of that component is 1 then skip it
 								pokCounterTaken[mx1]=true;								
 							}else{
-								for(int j = 0; j<gPfC.get(mx1).size();j++){
-									if(counterForAgents<numOfAgents){
+								for(int j = 0; j<gPfC.get(mx1).size();j++){ // find a free pokemon on that component and add an agent to the game/arena
+									if(counterForAgents<numOfAgents){//maybe this is irrelevant
 										if(gPfC.get(mx1).get(j).isTaken()==false){
 											game.addAgent(gPfC.get(mx1).get(j).get_edge().getSrc());
 											_ar.setAgents(Arena.getAgents(game.getAgents(), g));
@@ -341,74 +343,53 @@ public class Ex2_Client implements Runnable{
 									}	
 								}
 							}						
-						}else{
-							
-							
+						}else{//mx1==-1 that mean we already put in all the components (that bigger than 1) an agent
+							setFree();//change back the pokCounterTaken to normal
+							mx1 = findMaxIndex2(pokCounter);// find the new maximum on the pokCounter array
+							while(counterForAgents<numOfAgents)//while the counter < num of agents
+							{
+								if(pokCounter[mx1]>0) // if the number of pokemons on that component is larger than zero
+								{
+									for(int k = 0; k<gPfC.get(mx1).size();k++) // find a free pokemon and add a new agent
+									{
+										if(gPfC.get(mx1).get(k).isTaken()==false)
+										{
+											game.addAgent(gPfC.get(mx1).get(k).get_edge().getSrc());
+											_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+											gPfC.get(mx1).get(k).setTaken(true);									
+											pokCounter[mx1]--;
+											counterForAgents++;
+											break;
+										}
+									}
+								}else {// the number of agents on that component is equals to the number of pokemons on that component
+									game.addAgent((gPfC.get(mx1).get(counterForAgents%pokCounter[mx1]).get_edge().getSrc()));
+									_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+									counterForAgents++;
+								}
+							}
+
 						}
 					}			
 				}
-					
-				
-				
-				
-				
-				
-				/*
-				
-				{
-					for(int i=0; i<comps.size() ;i++){
-						if(comps.get(i).size()>1){
-							if(pokCounterTaken[i]==false){
-								game.addAgent(pokemons.get(i).get_edge().getSrc());
-								_ar.setAgents(Arena.getAgents(game.getAgents(), g));
-								if((counterForAgents++) == numOfAgents) break;
-							}							
-						}
-						if(counterForAgents < numOfAgents)
-						{
-							
-						}
-					}
-				}else if(numOfAgents > this.comps.size()){
-					
-				}else if(numOfAgents < this.comps.size()){
-					
-				}
-				
-				*/
 			}
-
-			
-			
-			
-			/*
-			for(int a = 0;a<numOfAgents;a++) {
-				int ind = a%pokemons.size();
-				Pokemon c = pokemons.get(ind);
-				int nn = c.get_edge().getDest();
-				if(c.getType()<0 ) {nn = c.get_edge() .getSrc();}
-				game.addAgent(nn);
-				_ar.setAgents(Arena.getAgents(game.getAgents(), g));
-				System.out.println(_ar.getAgents());
-			}
-			*/
 		}
 		catch (JSONException e) {e.printStackTrace();}
 	}	
-	
 
-	
+
+
 	private int findMaxIndex2(int[] arr){
 		int ans = -1;
 		for(int i=1;i<arr.length;i++)
 		{
 			if(arr[i]>=arr[ans] && pokCounterTaken[i] == false) {
 				ans=i;
-				}
+			}
 		}return ans;
 	}
-	
-	
+
+
 	private int findMaxIndex(int[] arr){
 		int ans = -1;
 		for(int i=1;i<arr.length;i++)
@@ -416,8 +397,8 @@ public class Ex2_Client implements Runnable{
 			if(arr[i]>arr[ans]) {ans=i;}
 		}return ans;
 	}
-	
-	
+
+
 	private void setFree()
 	{
 		for(int i = 0; i<pokCounterTaken.length;i++)
@@ -440,8 +421,8 @@ public class Ex2_Client implements Runnable{
 			}
 		return ans;
 	}
-	
-	*/
-	
+
+	 */
+
 }
 
