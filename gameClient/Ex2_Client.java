@@ -1,24 +1,31 @@
 package gameClient;
 
-import Server.Game_Server_Ex2;
-import api.DWGraph_Algo;
-import api.DWGraph_DS;
-import api.directed_weighted_graph;
-import api.edge_data;
-import api.game_service;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import Server.Game_Server_Ex2;
+import api.DWGraph_Algo;
+import api.directed_weighted_graph;
+import api.edge_data;
+import api.game_service;
 
 public class Ex2_Client implements Runnable{
 	private static MyFrame _win;
 	private static Arena _ar;
 	private static long id;
 	private static int scenario;
+	
+	
+	private HashMap <Integer, ArrayList<Pokemon>> gPfC; // get pokemon from components (each Integer is index of component from the variable comps)
+	private boolean[] pokCounterTaken;					// check if we already put an agent on the game
+	private List<List<Integer>> comps;
+	private HashMap<Integer,List<Integer>> components;
 	
 	public static void main(String[] a) 
 	{
@@ -31,7 +38,7 @@ public class Ex2_Client implements Runnable{
 	@Override
 	public void run()
 	{
-		int scenario_num = 4;
+		int scenario_num = 1;
 		game_service game = Game_Server_Ex2.getServer(scenario_num); // you have [0,23] games
 	//	int id = 999;
 	//	game.login(id);
@@ -41,7 +48,9 @@ public class Ex2_Client implements Runnable{
 		DWGraph_Algo ga = new DWGraph_Algo();
 		directed_weighted_graph gg = ga.fromJsonToGraph(g);
 
-		String pks = game.getPokemons();
+		this.components = new HashMap<Integer, List<Integer>>();
+		
+		//String pks = game.getPokemons();
 		init(game);
 		
 		game.startGame();
@@ -79,30 +88,28 @@ public class Ex2_Client implements Runnable{
 	 * @param gg
 	 * @param
 	 */
-	private static void moveAgants(game_service game, directed_weighted_graph gg) 
-	{
-		
-		String lg = game.move();
-		System.out.println("-------->"+lg);
-		List<Agent> log = Arena.getAgents(lg, gg);
-		_ar.setAgents(log);
+	private static void moveAgants(game_service game, directed_weighted_graph gg) {
+		String lg = game.move();		
+		List<Agent> agents = Arena.getAgents(lg, gg);
+		_ar.setAgents(agents);	
 		//ArrayList<OOP_Point3D> rs = new ArrayList<OOP_Point3D>();
-		
 		String fs =  game.getPokemons();
-		List<Pokemon> ffs = Arena.json2Pokemons(fs);
-		_ar.setPokemons(ffs);
-		for(int i=0;i<log.size();i++) 
-		{
-			Agent ag = log.get(i);
+		List<Pokemon> pokemons = Arena.json2Pokemons(fs);
+		_ar.setPokemons(pokemons);
+		for(int i=0;i<agents.size();i++) {
+			Agent ag = agents.get(i);
 			int id = ag.getID();
-			int dest = ag.getNextNode();
-			int src = ag.getSrcNode();
+			System.out.println("ID-------------->" + id);
+			int dest = ag.getNextNode();//if next node == -1
+			int src = ag.getSrcNode();// return the source node
+			System.out.println(src);
+			System.out.println("is: " +ag.getID());
 			double v = ag.getValue();
 			if(dest==-1) 
 			{
-				dest = nextNode(gg, src); 				//
-				game.chooseNextEdge(ag.getID(), dest);  //
-				System.out.println(game.getAgents());
+				//[0,1,2,3,4,5]
+				dest = nextNode(gg, src);
+				game.chooseNextEdge(ag.getID(), dest);
 				System.out.println("Agent: "+id+", val: "+v+"   turned to node: "+dest);
 			}
 		}
@@ -115,8 +122,10 @@ public class Ex2_Client implements Runnable{
 	 */
 	private static int nextNode(directed_weighted_graph g, int src)
 	{
+		
 		int ans = -1;
 		Collection<edge_data> ee = g.getE(src);
+	
 		Iterator<edge_data> itr = ee.iterator();
 		int s = ee.size();
 		int r = (int)(Math.random()*s);
@@ -129,173 +138,318 @@ public class Ex2_Client implements Runnable{
 		return ans;
 	}
 	
-	private void init(game_service game) 
-	{
-		String g = game.getGraph();
+	///////////////////Init//////////////////
+	private void init(game_service game) {
+		String jsonG = game.getGraph();
 		DWGraph_Algo ga = new DWGraph_Algo();
-		String fs = game.getPokemons();
-		directed_weighted_graph gg = ga.fromJsonToGraph(g);
-		//gg.init(g);
+		directed_weighted_graph g = ga.fromJsonToGraph(jsonG);
+		ga.init(g);
 		
+		String fs = game.getPokemons();
 		_ar = new Arena();
-		_ar.setGraph(gg);
+		_ar.setGraph(g);
 		_ar.setPokemons(Arena.json2Pokemons(fs));
 		_win = new MyFrame("test Ex2");
 		_win.setSize(1000, 700);
 		_win.update(_ar);
+		_win.show();
+		
+		String info = game.toString();
+		JSONObject jsonObj;
+		try {
+			//creating a json object
+			jsonObj = new JSONObject(info);
+			JSONObject gameServerObj = jsonObj.getJSONObject("GameServer");
+			//getting the number of agents of the current game
+			int numOfAgents = gameServerObj.getInt("agents");		
+			
+			gPfC = new HashMap<Integer, ArrayList<Pokemon>>();
+			ArrayList<Pokemon> pokemons = Arena.json2Pokemons(game.getPokemons());
+			for(int a = 0;a<pokemons.size();a++) { Arena.updateEdge(pokemons.get(a),g);} //Updating the arena with the pokemons and the graph	
+			this.comps = ga.getComp();			
+			// Creating array that count the number of pokemons on each component
+			int[] pokCounter = new int[this.comps.size()];
+			pokCounterTaken = new boolean[this.comps.size()];
+			int max = 0;
+			//finding and setting the number of pokemons on each comp
+			for (int i = 0; i < pokCounter.length; i++) {
+				gPfC.put(i, new ArrayList<Pokemon>());//for each i there will be a new array
+				for(int j =0; j<pokemons.size();j++)
+				{
+					if(this.comps.get(i).contains(pokemons.get(j).get_edge().getSrc())) {						
+						pokCounter[i]++;
+						this.components.put(pokemons.get(j).get_edge().getSrc(), this.comps.get(i));
+						//adding the Pokemon to the right component (in index)
+						ArrayList<Pokemon> a = gPfC.get(i);
+						a.add(pokemons.get(j));
+						if(pokCounter[i]>=pokCounter[max])	max=i;
+					}
+				}
+			}
+			System.out.println(gPfC);
+			
+			int counterForAgents = 0;
+			if(this.comps.size()==1){
+				if(numOfAgents<=pokemons.size()){
+					for(int i =0;i<pokemons.size();i++){				
+						game.addAgent(pokemons.get(i).get_edge().getSrc());
+						_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+						pokemons.get(i).setTaken(true);
+						if((counterForAgents++) == numOfAgents) break;		
+					}				
+				}//The case when there are more agents than pokemons
+				else
+				{
+					for(;counterForAgents<numOfAgents;counterForAgents++){
+						if(counterForAgents<=pokemons.size()){
+							game.addAgent(pokemons.get(counterForAgents).get_edge().getSrc());
+							_ar.setAgents(Arena.getAgents(game.getAgents(), g));	
+							pokemons.get(counterForAgents).setTaken(true);
+						}else{
+							game.addAgent(pokemons.get((counterForAgents%(pokemons.size()))).get_edge().getSrc());//instead of pokemon it sould be pokCounter
+							_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+							pokemons.get((counterForAgents%(pokemons.size()))).setTaken(true);
+						}
+					}
+				}
+			}
+			
+			else if(this.comps.size() > 1)
+			{
+				if(numOfAgents == this.comps.size())
+				{
+					for(counterForAgents = 0; counterForAgents<numOfAgents; counterForAgents++) // <=?
+					{
+						int mx1 = findMaxIndex2(pokCounter);
+						if(mx1!=-1) //That means we have an index that lead us to the max
+						{
+							// if the component with the max pokemons have one node then:
+							if(comps.get(mx1).size()==1)
+							{
+								pokCounterTaken[mx1]=true;	//Assume we already put an agent in there to not calculate it
+								counterForAgents--;
+							}else if(comps.get(mx1).size()>1){//In the component there is more than one node
+								
+								for(int i =0; i < gPfC.get(mx1).size();i++){//for every pokemon in that component
+									
+									if(gPfC.get(mx1).get(i).isTaken()==false){//if the the pokemon[i] in the component is not taken by someone than
+										
+										game.addAgent(gPfC.get(mx1).get(i).get_edge().getSrc());
+										_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+										gPfC.get(mx1).get(i).setTaken(true);
+										pokCounter[mx1]--;
+									}//else do nothing ****for now****
+								}
+							}			
+						}
+						else
+						{
+							setFree();
+							mx1 = findMaxIndex(pokCounter);
+							while(counterForAgents<numOfAgents){//
+								
+								if(pokCounter[mx1] > 0){								
+									for (int i = 0; i < comps.get(mx1).size(); i++) {
+										if(gPfC.get(mx1).get(i).isTaken()==false)
+										{
+											game.addAgent(gPfC.get(mx1).get(i).get_edge().getSrc());
+											_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+											gPfC.get(mx1).get(i).setTaken(true);
+											pokCounter[mx1]--;
+											counterForAgents++;
+										}
+									}
+								}
+							}
+						}
+						
+						
+					}
+				}else if(numOfAgents < this.comps.size())
+				{
+					counterForAgents=0;
+					while(counterForAgents<numOfAgents)
+					{
+						int mx1 = findMaxIndex2(pokCounter);
+						if(mx1>-1)
+						{
+							if(comps.get(mx1).size()<=1)
+							{
+								pokCounterTaken[mx1]=true;								
+							}else
+							{
+								ArrayList<Pokemon> tmp = gPfC.get(mx1);						
+								for(int i =0; i<tmp.size();i++)
+								{
+									if(tmp.get(i).isTaken()==false)
+									{
+										game.addAgent(tmp.get(i).get_edge().getSrc());
+										_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+										tmp.get(i).setTaken(true);
+										pokCounterTaken[mx1]=true;
+										pokCounter[mx1]--;
+										counterForAgents++;	
+										break;
+									}
+								}							
+							}
+						}
+						else//mx1==-1 that mean we already put in all the components that bigger than 1 an agent
+						{
+							setFree();
+							mx1 = findMaxIndex2(pokCounter);
+							while(counterForAgents<numOfAgents)
+							{
+								if(pokCounter[mx1] > 0)
+								{
+									for (int i = 0; i < comps.get(mx1).size(); i++) {
+										if(gPfC.get(mx1).get(i).isTaken()==false){
+											game.addAgent(gPfC.get(mx1).get(i).get_edge().getSrc());
+											_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+											gPfC.get(mx1).get(i).setTaken(true);
+											pokCounter[mx1]--;
+											counterForAgents++;
+										}
+									}
+								}else {//we have already put agents besides all the pokemons on the biggest component, then randomly add agents to the pokemons
+									game.addAgent((gPfC.get(mx1).get(counterForAgents%pokCounter[mx1]).get_edge().getSrc()));
+									_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+									counterForAgents++;						
+								}
+							}
+						}
+					}
+				}else if(numOfAgents > this.comps.size())
+				{
+					counterForAgents=0;
+					for(int i =0; i<this.comps.size();i++)
+					{
+						int mx1 = findMaxIndex2(pokCounter);
+						if(mx1 > -1)	//That means we didn't put in all the components agents
+						{
+							if(comps.get(mx1).size()<=1)
+							{
+								pokCounterTaken[mx1]=true;								
+							}else
+							{
+								for(int j = 0; j<gPfC.get(mx1).size();j++)
+								{
+									if(counterForAgents<numOfAgents)									
+									{
+										if(gPfC.get(mx1).get(j).isTaken()==false)
+										{
+											game.addAgent(gPfC.get(mx1).get(j).get_edge().getSrc());
+											_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+											gPfC.get(mx1).get(j).setTaken(true);	
+											pokCounterTaken[mx1] = true;
+											pokCounter[mx1]--;
+											counterForAgents++;
+											break;
+										}
+									}	
+								}
+							}						
+						}else {
+							
+							
+						}
+					}			
+				}
+					
+				
+				
+				
+				
+				
+				/*
+				
+				{
+					for(int i=0; i<comps.size() ;i++){
+						if(comps.get(i).size()>1){
+							if(pokCounterTaken[i]==false){
+								game.addAgent(pokemons.get(i).get_edge().getSrc());
+								_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+								if((counterForAgents++) == numOfAgents) break;
+							}							
+						}
+						if(counterForAgents < numOfAgents)
+						{
+							
+						}
+					}
+				}else if(numOfAgents > this.comps.size()){
+					
+				}else if(numOfAgents < this.comps.size()){
+					
+				}
+				
+				*/
+			}
+
+			
+			
+			
+			/*
+			for(int a = 0;a<numOfAgents;a++) {
+				int ind = a%pokemons.size();
+				Pokemon c = pokemons.get(ind);
+				int nn = c.get_edge().getDest();
+				if(c.getType()<0 ) {nn = c.get_edge() .getSrc();}
+				game.addAgent(nn);
+				_ar.setAgents(Arena.getAgents(game.getAgents(), g));
+				System.out.println(_ar.getAgents());
+			}
+			*/
+		}
+		catch (JSONException e) {e.printStackTrace();}
+	}	
+	
 
 	
-		_win.show();
-		String info = game.toString();
-		JSONObject line;
-		try {
-			line = new JSONObject(info);			
-			JSONObject ttt = line.getJSONObject("GameServer");
-			int rs = ttt.getInt("agents");
-			System.out.println(info);
-			System.out.println(game.getPokemons());
-			
-			//components
-		//	ga.tarjan(gg.getV().iterator().next());
-		//	ArrayList<ArrayList<Integer>> comps = ga.getComp();
-		//	int[] compCounter = new int[comps.size()];
-			ArrayList<Pokemon> cl_fs = Arena.json2Pokemons(game.getPokemons());			
-			
-			//int src_node = 0;  // arbitrary node, you should start at one of the pokemon
-			for(int a = 0;a<cl_fs.size();a++)
-			{
-				Arena.updateEdge(cl_fs.get(a),gg);
-				
-			}
-			
-//			int max= 0;
-//			for (int i = 0; i < cl_fs.size(); i++) 
-//			{
-//				for (int j = 0; j < compCounter.length; j++) 
-//				{
-//					if(comps.get(j).contains(cl_fs.get(i).get_edge().getSrc()))
-//					{
-//						compCounter[j]++;
-//						if(compCounter[j]>max)	max = j;
-//						break;
-//					}
-//				}			
-//			}
-//			if(rs==1)
-//			{
-//				List<Agent> ag = Arena.getAgents(game.getAgents(), gg);
-//				ag.iterator().next().setComp(comps.get(max));
-//				for (int i = 0; i < cl_fs.size(); i++) 
-//				{
-//						if(comps.get(max).contains(cl_fs.get(i).get_edge().getSrc()))
-//						{
-//							game.addAgent(cl_fs.get(i).get_edge().getSrc());
-//						}		
-//				}
-//				
-//			}
-//			
-//			else
-//			{
-//				for(int a = 0;a<rs;a++) 
-//				{
-//					int ind = a%cl_fs.size();
-//					Pokemon c = cl_fs.get(ind);
-//					int nn = c.get_edge().getDest();
-//					if(c.getType()<0 ) 
-//					{
-//						nn = c.get_edge().getSrc();
-//					}
-//					game.addAgent(nn);
-//				}
-//			}
-//			
-			
-			
-			  for(int a = 0;a<rs;a++) 
-				{
-					int ind = a%cl_fs.size();
-					Pokemon c = cl_fs.get(ind);
-					int nn = c.get_edge().getDest();
-					if(c.getType()<0 ) 
-					{
-						nn = c.get_edge().getSrc();
-					}
-					game.addAgent(nn);
-				}
-			 
-		}
-		
-		catch (JSONException e) 
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	
-	private static void moveAgants2(game_service game, directed_weighted_graph gg)
-	{
-		String lg = game.move();
-		
-		//Getting the new list of agents from the new "game"/"move" on the graph
-		List<Agent> log = Arena.getAgents(lg, gg);
-		// and apply it on the arena
-		_ar.setAgents(log);
-		
-		
-		//ArrayList<OOP_Point3D> rs = new ArrayList<OOP_Point3D>();
-		
-		String fs =  game.getPokemons();
-		List<Pokemon> ffs = Arena.json2Pokemons(fs);
-		_ar.setPokemons(ffs);
-		
-		DWGraph_Algo tmp = new DWGraph_Algo();
-		directed_weighted_graph etasd = _ar.getGraph();
-		tmp.init(etasd);
-		
-		for(int i=0;i<log.size();i++) 
-		{
-			Agent ag = log.get(i);
-			int id = ag.getID();
-			int dest = ag.getNextNode();
-			int src = ag.getSrcNode();
-			double v = ag.getValue();
-			if(dest==-1) 
-			{
-				//If there is already a short path to one of the pokemons (for the current agent), then:
-				if(ag.getComp().size()>0)
-				{
-					for (int j = 0; j < ag.getComp().size(); j++) {
-						if(ag.getComp().get(j)==src)
-						{
-							dest = ag.getComp().get(j+1);
-						}		
-					}
-				}
-			//	List<List<Integer>> tmp2 = tmp.getComp();
-			//	int agentcomp =0;				
-				dest = nextNode2(gg, src); 				//
-				game.chooseNextEdge(ag.getID(), dest);  //
-				System.out.println(game.getAgents());
-				System.out.println("Agent: "+id+", val: "+v+"   turned to node: "+dest);
-			}
-		}
-	}
-	
-	
-	private static int nextNode2(directed_weighted_graph g, int src)
-	{
+	private int findMaxIndex2(int[] arr){
 		int ans = -1;
-		Collection<edge_data> ee = g.getE(src);
-		Iterator<edge_data> itr = ee.iterator();
-		int s = ee.size();
-		int r = (int)(Math.random()*s);
-		int i=0;
-		while(i<r) 
+		for(int i=1;i<arr.length;i++)
 		{
-			itr.next();i++;
+			if(arr[i]>=arr[ans] && pokCounterTaken[i] == false) {
+				ans=i;
+				}
+		}return ans;
+	}
+	
+	
+	private int findMaxIndex(int[] arr){
+		int ans = -1;
+		for(int i=1;i<arr.length;i++)
+		{
+			if(arr[i]>arr[ans]) {ans=i;}
+		}return ans;
+	}
+	
+	
+	private void setFree()
+	{
+		for(int i = 0; i<pokCounterTaken.length;i++)
+		{
+			pokCounterTaken[i]=false;
 		}
-		ans = itr.next().getDest();
+	}
+	/*
+	private int[] removeMaxFromArr(int[] arr, int index) {
+		int[] ans = new int[arr.length-1];
+		for (int i = 0; i < arr.length; i++) 
+		{
+			if(i==index) 
+			{
+				while(i<arr.length-2)
+				{
+					ans[i]=arr[i+1];}
+				}
+			else ans[i]=arr[i+1];
+			}
 		return ans;
 	}
+	
+	*/
+	
 }
+

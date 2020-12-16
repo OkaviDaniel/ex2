@@ -26,9 +26,19 @@ public class Agent {
 	private Pokemon curr_fruit;
 	private long sg_dt;
 	private double value;
+
+	private ArrayList<node_data> currentPath;
 	
-	
+	public ArrayList<node_data> getCurrentPath() {
+		return currentPath;
+	}
+
+	public void setCurrentPath(ArrayList<node_data> currentPath) {
+		this.currentPath = currentPath;
+	}
+
 	private List<Integer> currentComp;
+	private int compIndex;
 	//public int indexOnTheComp;
 	
 	public Agent(directed_weighted_graph g, int start_node) 
@@ -40,18 +50,17 @@ public class Agent {
 		id = -1;
 		this.speed = 0;
 		currentComp = new ArrayList<Integer>(); //??
+		
 	}
 	
-	// a new constructor with component
-	public Agent(directed_weighted_graph g, int start_node, List<Integer> comp) 
+	public int getCompIndex()
 	{
-		gg = g;
-		this.value = 0; // val == money
-		this.curr_node = gg.getNode(start_node);
-		pos = curr_node.getLocation();
-		id = -1;
-		this.speed = 0;
-		this.currentComp = comp;
+		return compIndex;
+	}
+	
+	public void setCompIndex(int a)
+	{
+		compIndex = a;
 	}
 	
 	public void update(String json) {

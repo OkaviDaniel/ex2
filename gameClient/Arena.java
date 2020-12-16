@@ -122,6 +122,7 @@ public class Arena {
 		
 		ArrayList<Agent> ans = new ArrayList<Agent>();
 		try {
+			//System.out.println(aa);
 			JSONObject ttt = new JSONObject(aa);
 			JSONArray ags = ttt.getJSONArray("Agents");
 			for(int i=0;i<ags.length();i++) {

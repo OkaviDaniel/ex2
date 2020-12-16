@@ -1,5 +1,8 @@
 package gameClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONObject;
 
 import api.EdgeData;
@@ -15,19 +18,34 @@ public class Pokemon
 	private Point3D pos;
 	private double min_dist;
 	private int min_ro;
+	
+	private boolean taken;
+	//private List<Integer> comp;
+	private int x = 10;
 	//private double speed;
 	
-	public Pokemon(Point3D p, int t, double v,/* double s,*/ edge_data e)
+	
+	public Pokemon(Point3D pos, int t, double v,/* double s,*/ edge_data e)
 	{
-		this.pos = p;
+		this.pos = pos;
 		this.type = t;
 		this.value = v;
 		//this.speed = s;
 		edge = e;
 		min_dist = -1;
 		min_ro = -1;
+		//comp = new ArrayList<Integer>();
+		taken =false;
 	}
 	
+	public boolean isTaken() {
+		return taken;
+	}
+
+	public void setTaken(boolean taken) {
+		this.taken = taken;
+	}
+
 	public static Pokemon init_from_json(String json)
 	{
 		try
