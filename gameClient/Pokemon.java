@@ -23,7 +23,7 @@ public class Pokemon
 	//private List<Integer> comp;
 	private int x = 10;
 	//private double speed;
-	
+	private Agent predator;
 	
 	public Pokemon(Point3D pos, int t, double v,/* double s,*/ edge_data e)
 	{

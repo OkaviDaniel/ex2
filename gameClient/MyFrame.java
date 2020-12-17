@@ -53,7 +53,7 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 	private void updateFrame() {
 		
 		Range rx = new Range(20,this.getWidth()-20);
-		Range ry = new Range(this.getHeight()-10,150);
+		Range ry = new Range(this.getHeight()-20,80);
 		Range2D frame = new Range2D(rx,ry);
 		directed_weighted_graph g = ar.getGraph();
 		w2f = Arena.w2f(g,frame);
