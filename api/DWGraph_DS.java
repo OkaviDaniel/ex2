@@ -261,6 +261,22 @@ public class DWGraph_DS implements directed_weighted_graph , Serializable{
 		return null;
 	}
 
+	public boolean hasEdge(int src, int dest)
+	{
+		boolean ans = false;
+		if(nodesInGraph.containsKey(src) && nodesInGraph.containsKey(dest))
+		{
+			if(edges.containsKey(src))
+			{
+				if(edges.get(src).containsKey(dest))
+				{
+					ans=true;
+				}			
+			}		
+		}		
+		return ans;
+	}
+	
 	public Collection<node_data> getNi(int src)
 	{
 		return neighbors.get(src);
