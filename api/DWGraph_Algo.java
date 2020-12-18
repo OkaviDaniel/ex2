@@ -126,24 +126,7 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 
 		}	
 	}
-
-	@Override
-	public boolean isConnected()
-	{	
-		ArrayList<node_data>allNodes=new ArrayList<node_data>(g.getV());
-		if(allNodes.size()==0 || allNodes.size()==1) {
-			return true;
-		}
-		Dijkstra(g,allNodes.get(0));
-
-		if(dijkstraCounter!=allNodes.size()){ //for(int i=0;i<allNodes.size();i++) {
-			return false;                     //	node_data n=allNodes.get(i);
-		}                                     // if(n.getWeight()==Integer.MAX_VALUE) {
-		dijkstraCounter=0;                    //             return false;
-		return true;                          //  }                             
-	}		                                  //}                                     
-
-
+	
 	@Override
 	public double shortestPathDist(int src, int dest) {
 
@@ -270,7 +253,7 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		}
 	}
 
-	public boolean connectedOrNot()
+	public boolean isConnected()
 	{
 		if(g.getV().size()==0 || g.getV().size()==1)
 		{
@@ -366,7 +349,7 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	}
 	
 	
-	public void dfs(node_data u)
+	private void dfs(node_data u)
 	{
 		lowlink[u.getKey()] = time++;
 		u.setInfo("Visited");
@@ -417,14 +400,14 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		if(components.size()==1)
 		{
 			
-			System.out.println("true");
+			//System.out.println("true");
 			restoreNodes();
 			return components;
 		}
 		else
 		{
 			restoreNodes();
-			System.out.println("false");
+			//System.out.println("false");
 			return components;
 		}
 		
@@ -486,5 +469,43 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 			return null;
 		}	
 	}
+	
+	public double oneCallShrtPathD(int src, int dest) {
+		node_data srcNode=g.getNode(src);
+		node_data destNode=g.getNode(dest);
+		if(srcNode==null || destNode==null)
+			return -1;
+		if(srcNode==destNode)//are the same node
+			return 0;		
+		if(destNode.getWeight()==Integer.MAX_VALUE) {
+			return -1;
+		}
+		return destNode.getWeight();
+	}
+	public List<node_data> shortCurrPath(int src, int dest) {
+
+		node_data srcNode=g.getNode(src);
+		node_data destNode=g.getNode(dest);
+
+		if(srcNode==null || destNode==null) {
+			return null;
+		}
+		if(srcNode==destNode) {//are the same node
+			LinkedList<node_data> myList=new LinkedList<node_data>();
+			myList.add(srcNode);			
+			return myList;
+		}
+		LinkedList<node_data> myList=new LinkedList<node_data>();
+		node_data iterator=destNode;
+		while(iterator!=srcNode) {		
+			myList.add(iterator) ;      
+			iterator=g.getNode(iterator.getTag());						
+		}
+		myList.add(iterator);
+		Collections.reverse(myList);
+		return myList;
+	}
+	
+	
 }
 
