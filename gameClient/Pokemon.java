@@ -134,4 +134,12 @@ public class Pokemon
 	{
 		this.min_ro = min_ro;
 	}
+
+	public Agent getPredator() {
+		return predator;
+	}
+
+	public void setPredator(Agent predator) {
+		this.predator = predator;
+	}
 }

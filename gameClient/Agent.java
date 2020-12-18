@@ -12,8 +12,8 @@ import api.geo_location;
 import api.node_data;
 import gameClient.util.Point3D;
 
-public class Agent {
-
+public class Agent extends Thread implements Runnable {
+	
 	public static final double EPS = 0.0001;
 	//private static int count = 0;
 	//private static int seed = 3331; //?
@@ -27,13 +27,13 @@ public class Agent {
 	private long sg_dt;
 	private double value;
 
-	private ArrayList<node_data> currentPath;
+	private List<node_data> currentPath;
 	
-	public ArrayList<node_data> getCurrentPath() {
+	public List<node_data> getCurrentPath() {
 		return currentPath;
 	}
 
-	public void setCurrentPath(ArrayList<node_data> currentPath) {
+	public void setCurrentPath(List<node_data> currentPath) {
 		this.currentPath = currentPath;
 	}
 
@@ -222,7 +222,8 @@ public class Agent {
 			geo_location src = gg.getNode(get_curr_edge().getSrc()).getLocation();
 			double de = src.distance(dest);
 			double dist = pos.distance(dest);
-			if(this.get_curr_fruit().get_edge()==this.get_curr_edge()) {
+			if(this.get_curr_fruit().get_edge()==this.get_curr_edge())
+			{
 				 dist = curr_fruit.getLocation().distance(this.pos);
 			}
 			double norm = dist/de;
@@ -232,7 +233,7 @@ public class Agent {
 		this.set_sg_dt(ddt);
 	}
 	
-	public edge_data get_curr_edge()
+	 public edge_data get_curr_edge()
 	{
 		return this.curr_edge;
 	}
@@ -244,6 +245,12 @@ public class Agent {
 	public void set_sg_dt(long _sg_dt) 
 	{
 		this.sg_dt = _sg_dt;
+	}
+
+	@Override
+	public void run() 
+	{	
+		
 	}
 	
 }
