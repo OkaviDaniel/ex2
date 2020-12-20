@@ -5,7 +5,8 @@ Directed and weighted graph implementation
 
 ## first part:
 
-The first part describes a number of classes that represent a weighted graph and special algorithms that can be performed on it.
+The first part describes a number of classes that represent a weighted graph and special
+algorithms that can be performed on it.
 The two main class in this part are:
 
 1) DWGraph_DS
