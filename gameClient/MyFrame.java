@@ -32,6 +32,8 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 	private gameClient.util.Range2Range w2f;
 	
 	
+	
+	
 	//For zoom panel
 	private double _zoom = 1d, _cZoom = 0.01, _minSize = 1;
 	private int midX, midY, pX, pY; 

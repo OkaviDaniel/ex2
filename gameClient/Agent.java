@@ -6,6 +6,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 import api.GeoLocation;
+import api.NodeData;
 import api.directed_weighted_graph;
 import api.edge_data;
 import api.geo_location;
@@ -26,8 +27,20 @@ public class Agent extends Thread implements Runnable {
 	private Pokemon curr_fruit;
 	private long sg_dt;
 	private double value;
-
-	private List<node_data> currentPath;
+	
+	
+	private List<node_data> currentPath = new ArrayList<>();
+	
+	public Agent()
+	{
+		gg = null;
+		this.value = 0; // val == money
+		this.curr_node = new NodeData();
+		pos = curr_node.getLocation();
+		id = -1;
+		this.speed = 0;
+		currentComp = new ArrayList<Integer>(); //??
+	}
 	
 	public List<node_data> getCurrentPath() {
 		return currentPath;

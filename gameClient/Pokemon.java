@@ -12,12 +12,14 @@ import gameClient.util.Point3D;
 public class Pokemon 
 {
 
+	private static int counter = 0;
 	private edge_data edge;
 	private double value;
 	private int type;
 	private Point3D pos;
 	private double min_dist;
 	private int min_ro;
+	private int id;
 	
 	private boolean taken;
 	//private List<Integer> comp;
@@ -36,6 +38,7 @@ public class Pokemon
 		min_ro = -1;
 		//comp = new ArrayList<Integer>();
 		taken =false;
+		this.setId(counter++);
 	}
 	
 	public boolean isTaken() {
@@ -141,5 +144,13 @@ public class Pokemon
 
 	public void setPredator(Agent predator) {
 		this.predator = predator;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }
