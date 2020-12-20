@@ -27,34 +27,24 @@ The DWGraph_DS class enables the creation of a graph and contains methods such a
 
 getNode (int key)-
 Returns the vertex with the ID, otherwise returns null.
-
 getEdge (int src, int dest)-
-Returns the edge (src,dest), null if none.
-
+Returns the edge (src,dest), null if none
 addNode (node_data n)-
 Adds a new node to the graph with the given node_data.
-
 connect (int src, int dest, double w)-
 Connects an edge with weight w between node src to node dest.
-
 getV ()-
 Returns a pointer for the collection representing all the nodes in the graph.
-
 getE (int node_id)-
 Returns a pointer for the collection representing all the edges getting out of the given node. 
-
 removeNode (int key)-
 Deletes the node from the graph and removes all edges which starts or ends at this node.
-
 removeEdge (int src, int dest)-
 Deletes the edge from the graph.
-
 nodeSize ()-
 Returns the number of vertices (nodes) in the graph.
-
 edgeSize ()-
 Returns the number of edges (assume directional graph).
-
 getMC ()-
 Returns the Mode Count - for testing changes in the graph
 
@@ -222,8 +212,8 @@ Allows you to convert distances and locations between the Frame and the real wor
 Point3D-
 Represents a three-dimensional point in space, Athens is used primarily to know where agents and Pokemon are located on the graph.
 
-Ex2-
+*Ex2-
 The class that represents the entire game, presents it visually and contains the algorithms we implemented.
 
-#The project was very interesting , hope you enjoy it!
+# The project was very interesting , hope you enjoy it!
 
