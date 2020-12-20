@@ -55,6 +55,10 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		return this.g;
 	}
 
+	/**
+	 * Implements a deep copy of the current graph.
+	 * @return directed_weighted_graph The copied graph.
+	 */
 	@Override
 	public directed_weighted_graph copy() {
 		DWGraph_DS graphTo = new  DWGraph_DS();
@@ -104,17 +108,11 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		
 		//set source distance to 0
 		source.setWeight(0);
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		nodeInfoPriorityOueue.remove(source);
-		nodeInfoPriorityOueue.add(source);
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		
+		nodeInfoPriorityOueue.add(source);		
 		while(nodeInfoPriorityOueue.size()>0) {
-
 			node_data polledNode=nodeInfoPriorityOueue.poll();
-			//System.out.println(nodeInfoPriorityOueue);
 			ArrayList<node_data>adjecents=new ArrayList<node_data>(((DWGraph_DS)graph).getNi(polledNode.getKey()));
-			//System.out.println("Curr node:"+polledNode+" , list: "+ adjecents);
 			for (int i = 0; i < adjecents.size(); i++) {
 				node_data adj=adjecents.get(i);
 				if(adj.getInfo().equals("w")) {
@@ -122,40 +120,48 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 					if(totalWeight < adj.getWeight()) {
 						nodeInfoPriorityOueue.remove(adj);
 						adj.setWeight(totalWeight);
-						//System.out.println(polledNode.getKey());
 						adj.setTag(polledNode.getKey());
 						nodeInfoPriorityOueue.add(adj);
 					}
 				}
 			}
 			polledNode.setInfo("b");
-		//	System.out.println("key: " +polledNode.getKey()+",tag: " +polledNode.getTag());
 			dijkstraCounter++;
 
 		}	
 	}
 	
+	
+	/**
+	 * Find the efficient path (That contains the minimum weight) between two nodes on the graph.
+	 * @param src	The source node
+	 * @param dest	The destination node
+	 * @return double The weight of the most efficient weight.
+	 */
 	@Override
 	public double shortestPathDist(int src, int dest) {
 		node_data srcNode=g.getNode(src);
 		node_data destNode=g.getNode(dest);
 		if(srcNode==null || destNode==null)
 		{
-			//System.out.println("hello");
 			return -1;
 		}			
 		if(srcNode==destNode)//are the same node
 			{return 0;}
-		//System.out.println("src node in shortestPathDist: " +  src);
 
 		Dijkstra(g, srcNode);
 		if(destNode.getWeight()==Integer.MAX_VALUE) {
-			//System.out.println("Hello2");
 			return -1;
 		}
 		return destNode.getWeight();
 	}
 
+	/**
+	 * Find the shortest path between two nodes on the graph. (returns null if there is no path?)
+	 * @param src	The source node
+	 * @param dest	The destination node
+	 * @return List<node_data> A list of nodes that create the most efficient path.
+	 */
 	@Override
 	public List<node_data> shortestPath(int src, int dest) {
 
@@ -164,14 +170,12 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 
 		if(srcNode==null || destNode==null)
 		{
-			//System.out.println("Hello3");
 			return null;
 		}
 			
 		if(srcNode==destNode) {//are the same node
 			LinkedList<node_data> myList=new LinkedList<node_data>();
 			myList.add(srcNode);
-			//System.out.println("Hello2");
 			return myList;
 		}
 		LinkedList<node_data> myList=new LinkedList<node_data>();
@@ -183,7 +187,6 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 			myList.add(iterator) ;                   	
 			if(g.getNode(iterator.getTag())!=null)
 			{
-				//System.out.println("Curr iterator: " + iterator);
 				iterator=g.getNode(iterator.getTag());
 			}
 		}
@@ -192,6 +195,11 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		return myList;
 	}
 
+	/**
+	 * Save the current graph to a local file on the computer.
+	 * @param file	The file location.
+	 * @return	boolean	True if successfully saved the graph, else return false.
+	 */
 	@Override
 	public boolean save(String file) {
 		String json1 = "{";
@@ -200,7 +208,6 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		{
 			json1 = json1 + e.toJson() + ",";
 		}
-		
 		//Getting rid of the last ','
 		String json2 = "";
 		if(!(json1.charAt(json1.length()-1)=='['))
@@ -218,9 +225,7 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 			//There are no edges, then just add "],"
 			json2 = json1 + "],";
 		}
-			
-		
-		
+	
 		//For nodes
 		String json3 = "\"Nodes\":[";
 		for(node_data n: g.getV())
@@ -248,7 +253,6 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		try {
 			PrintWriter aw = new PrintWriter(new File(file));
 			aw.write(ans);
-			//System.out.println(ans);
 			aw.close();
 			return true;
 		}catch(FileNotFoundException e){
@@ -257,6 +261,11 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		}			
 	}
 
+	/**
+	 * Load a graph from a json file
+	 * @param file		The string location of the file
+	 * @return boolean 	True if successfully loaded the graph, else return false.
+	 */
 	@Override
 	public boolean load(String file)
 	{			
@@ -266,10 +275,8 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 			Gson gson = builder.create();
 			
 			FileReader reader = new FileReader(file);
-		//	System.out.println(reader);
 			DWGraph_DS a = gson.fromJson(reader,DWGraph_DS.class);
 			this.g = a;
-			//System.out.println(a);
 			return true;
 		}catch(FileNotFoundException e) {
 			e.printStackTrace();
@@ -337,64 +344,58 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	
 	
 	/**
-	 * 
+	 * Implementation of breadth first search algorithm.
 	 * @param src The source node that the algorithm is going to start from
 	 */
-	private void bfs(node_data src)
-	{
-		if(g.getV().contains(src))
-		{
+	private void bfs(node_data src){
+		if(g.getV().contains(src)){
 			LinkedList<node_data> q = new LinkedList<node_data>();
 			src.setInfo("Visited");
 			q.add(src);		
-			while(!q.isEmpty()) {
+			while(!q.isEmpty()){
 				node_data temp = q.removeFirst();			
 				Collection<node_data> ni = ((DWGraph_DS)g).getNi(temp.getKey());
-				for(node_data f : ni)
-				{
-					if(!f.getInfo().equals("Visited"))
-					{						
+				for(node_data f : ni){
+					if(!f.getInfo().equals("Visited")){						
 						f.setInfo("Visited");
 						q.add(f);	
 						counter1++;
 					}
 				}
 			}
-		}
-		//System.out.println("This is the counter: " + counter1);
-		
+		}		
 	}
+	/**
+	 * Restore the nodes info to their default state
+	 */
 	private void restoreNodes()
 	{
-		if(g.getV().size()>0)
-		{
+		if(g.getV().size()>0){
 			Iterator<node_data> f = g.getV().iterator();
-			while(f.hasNext())
-			{
+			while(f.hasNext()){
 				node_data temp = f.next();
-				if(!temp.getInfo().equals("NotVisited"))
-				{
+				if(!temp.getInfo().equals("NotVisited")){
 					temp.setInfo("NotVisited");
 				}
 			}
 		}
 	}
 	
-	
+	/**
+	 * Implementation of depth first search algorithm, including creating the components list.
+	 * @param u	The current node we are going to travel from.
+	 */
 	private void dfs(node_data u)
 	{
 		lowlink[u.getKey()] = time++;
 		u.setInfo("Visited");
 		stack.add(u);
 		boolean uIsComponentRoot = true;
-		for(node_data v : ((DWGraph_DS)g).getNi(u.getKey()))
-		{
-			if(!v.getInfo().equals("Visited"))
-			{
+		for(node_data v : ((DWGraph_DS)g).getNi(u.getKey())){
+			if(!v.getInfo().equals("Visited")){
 				dfs(v);
 			}
-			if(lowlink[u.getKey()] > lowlink[v.getKey()])
-			{
+			if(lowlink[u.getKey()] > lowlink[v.getKey()]){
 				lowlink[u.getKey()] = lowlink[v.getKey()];
 				uIsComponentRoot = false;
 			}		
@@ -403,8 +404,7 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		if(uIsComponentRoot)
 		{
 			List<Integer> component = new ArrayList<>();
-			while(true)
-			{
+			while(true){
 				int x = stack.pop().getKey();
 				component.add(x);
 				lowlink[x] = Integer.MAX_VALUE;
@@ -416,7 +416,11 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	}
 	
 	
-	public List<List<Integer>> tarjan()
+	/**
+	 * Implementation of Tarjan algorithm.
+	 * @return	List<List<Integer>> the components of the graph.
+	 */
+	public List<List<Integer>> tarjan()//Time complexity: O(|E|*|V|)
 	{
 		stack = new Stack<>();
 		time = 0;
@@ -443,6 +447,10 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		
 	}
 	
+	/**
+	 * Returns the components of the graph.
+	 * @return List<List<Integer>> Returns a list of list of integers that represent the components on the graph.
+	 */
 	public List<List<Integer>> getComp()
 	{	
 			List<List<Integer>> tmp = tarjan();
@@ -450,7 +458,11 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 			return tmp;		
 	}
 	
-	
+	/**
+	 * Transforms a json string to an actual directed weighted graph.
+	 * @param json	A string in json format that representing a graph.
+	 * @return	directed_weighted_graph a new graph.
+	 */
 	public directed_weighted_graph fromJsonToGraph(String json)
 	{
 		JSONObject jsonObj;
@@ -459,8 +471,7 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 			DWGraph_DS g = new DWGraph_DS();
 			jsonObj = new JSONObject(json);
 			JSONArray nodesEl = (JSONArray) jsonObj.get("Nodes");
-			for(int i = 0; i<nodesEl.length();i++)
-			{
+			for(int i = 0; i<nodesEl.length();i++){
 				JSONObject tmp1 = nodesEl.getJSONObject(i);
 				int id = tmp1.getInt("id");
 				NodeData n1 = new NodeData(id);
@@ -470,14 +481,12 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 				double y = Double.parseDouble(geoTmp2[1]);
 				double z = Double.parseDouble(geoTmp2[2]);
 				n1.setLocation(new GeoLocation(x, y, z));				
-				g.addNode(n1);
-				
+				g.addNode(n1);			
 			}			
 			
 			JSONArray edgesEl = (JSONArray) jsonObj.get("Edges");
 		
-			for(int i = 0; i<edgesEl.length();i++)
-			{
+			for(int i = 0; i<edgesEl.length();i++){
 				JSONObject tmp2 = edgesEl.getJSONObject(i);
 				int src = tmp2.getInt("src");
 				int dest = tmp2.getInt("dest");
@@ -486,13 +495,19 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 			}
 			return g;
 		}
-		catch(Exception e) 
-		{
+		catch(Exception e){
 			e.printStackTrace();
 			return null;
 		}	
 	}
 	
+	/**
+	 * Returns the weight of the most efficient path from a source vertex to the given destination.
+	 * (You are going to use this function after using the dijkstra algorithm)			 
+	 * @param src 	the source vertex
+	 * @param dest	the destination vertex
+	 * @return
+	 */
 	public double oneCallShrtPathD(int src, int dest) {
 		node_data srcNode=g.getNode(src);
 		node_data destNode=g.getNode(dest);
@@ -507,6 +522,12 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	}
 	
 	
+	/**
+	 * Returns a list of nodes of the most efficient path from a source vertex to the given destination.
+	 * @param src	the source vertex
+	 * @param dest	the destination vertex
+	 * @return
+	 */
 	public List<node_data> shortCurrPath(int src, int dest) {
 
 		node_data srcNode=g.getNode(src);

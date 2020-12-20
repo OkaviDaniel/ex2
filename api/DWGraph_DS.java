@@ -58,6 +58,7 @@ public class DWGraph_DS implements directed_weighted_graph , Serializable{
 		}
 		return ans;
 	}
+	
 	@Override
 	public node_data getNode(int key) {
 		if(nodesInGraph.containsKey(key))
@@ -108,6 +109,7 @@ public class DWGraph_DS implements directed_weighted_graph , Serializable{
 		}
 		return ans;
 	}
+	
 	@Override
 	public void connect(int src, int dest, double w) 
 	{		
@@ -224,8 +226,7 @@ public class DWGraph_DS implements directed_weighted_graph , Serializable{
 	}
 
 	@Override
-	public edge_data removeEdge(int src, int dest) {
-		
+	public edge_data removeEdge(int src, int dest) {		
 //	if(nodesInGraph.containsKey(src))
 //	{				
 		if(edges.containsKey(src))
@@ -315,14 +316,6 @@ public class DWGraph_DS implements directed_weighted_graph , Serializable{
 			double w = a.getWeight();
 			removeEdge(src1, dest1);
 			connect(dest1, src1, w);
-		//	counter2++;
 		}
-		//System.out.println(counter2);
-	}
-		
-/////////////////////////internal class NodeData///////////////////////////////
-	
-////////////////internal class GeoLocation/////////////////////////////////////
-	
-	
+	}	
 }
