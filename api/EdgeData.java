@@ -19,7 +19,7 @@ public class EdgeData implements edge_data{
 	
 	public String toString()
 	{
-		return "Src: +"+src+",Dest: "+dest+",Weight: "+weight;
+		return "Src: " +src+ ",Dest: " +dest+ ",Weight: " +weight;
 	}
 	public EdgeData(int src, int dest, double weight)
 	{

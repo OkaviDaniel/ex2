@@ -29,6 +29,7 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	private directed_weighted_graph g;
 	private int dijkstraCounter=0;
 	private static long counter1 = 1;
+	
 	//For tarjanAlgorithm only--v--
 	private int time;
 	private List<List<Integer>> components;
@@ -85,7 +86,6 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	}
 
 
-
 	public void Dijkstra(directed_weighted_graph graph, node_data source) {
 
 		Collection<node_data> nodeInfoArrayList = graph.getV();
@@ -101,14 +101,20 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 			node.setInfo("w");
 			nodeInfoPriorityOueue.add(node);//add all nodes to queue
 		}
-
+		
 		//set source distance to 0
 		source.setWeight(0);
-		//for every node in queue ,pull him out,get all adjecents wasn't visited and decide minimum distance from source
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		nodeInfoPriorityOueue.remove(source);
+		nodeInfoPriorityOueue.add(source);
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		
 		while(nodeInfoPriorityOueue.size()>0) {
 
 			node_data polledNode=nodeInfoPriorityOueue.poll();
+			//System.out.println(nodeInfoPriorityOueue);
 			ArrayList<node_data>adjecents=new ArrayList<node_data>(((DWGraph_DS)graph).getNi(polledNode.getKey()));
+			//System.out.println("Curr node:"+polledNode+" , list: "+ adjecents);
 			for (int i = 0; i < adjecents.size(); i++) {
 				node_data adj=adjecents.get(i);
 				if(adj.getInfo().equals("w")) {
@@ -116,12 +122,14 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 					if(totalWeight < adj.getWeight()) {
 						nodeInfoPriorityOueue.remove(adj);
 						adj.setWeight(totalWeight);
+						//System.out.println(polledNode.getKey());
 						adj.setTag(polledNode.getKey());
 						nodeInfoPriorityOueue.add(adj);
 					}
 				}
 			}
 			polledNode.setInfo("b");
+		//	System.out.println("key: " +polledNode.getKey()+",tag: " +polledNode.getTag());
 			dijkstraCounter++;
 
 		}	
@@ -129,15 +137,20 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	
 	@Override
 	public double shortestPathDist(int src, int dest) {
-
 		node_data srcNode=g.getNode(src);
 		node_data destNode=g.getNode(dest);
 		if(srcNode==null || destNode==null)
+		{
+			//System.out.println("hello");
 			return -1;
+		}			
 		if(srcNode==destNode)//are the same node
-			return 0;
+			{return 0;}
+		//System.out.println("src node in shortestPathDist: " +  src);
+
 		Dijkstra(g, srcNode);
 		if(destNode.getWeight()==Integer.MAX_VALUE) {
+			//System.out.println("Hello2");
 			return -1;
 		}
 		return destNode.getWeight();
@@ -150,18 +163,29 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		node_data destNode=g.getNode(dest);
 
 		if(srcNode==null || destNode==null)
+		{
+			//System.out.println("Hello3");
 			return null;
+		}
+			
 		if(srcNode==destNode) {//are the same node
 			LinkedList<node_data> myList=new LinkedList<node_data>();
 			myList.add(srcNode);
+			//System.out.println("Hello2");
 			return myList;
 		}
 		LinkedList<node_data> myList=new LinkedList<node_data>();
 		Dijkstra(g, srcNode);
 		node_data iterator=destNode;
-		while(iterator!=srcNode) {
+		while(iterator!=srcNode) 
+		{
+			
 			myList.add(iterator) ;                   	
-			iterator=g.getNode(iterator.getTag());
+			if(g.getNode(iterator.getTag())!=null)
+			{
+				//System.out.println("Curr iterator: " + iterator);
+				iterator=g.getNode(iterator.getTag());
+			}
 		}
 		myList.add(iterator);
 		Collections.reverse(myList);
@@ -253,6 +277,10 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		}
 	}
 
+	/**
+	 * This method check if the current graph is strongly connected (Using bfs algorithm).
+	 * 
+	 */
 	public boolean isConnected()
 	{
 		if(g.getV().size()==0 || g.getV().size()==1)
@@ -308,6 +336,10 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 	}
 	
 	
+	/**
+	 * 
+	 * @param src The source node that the algorithm is going to start from
+	 */
 	private void bfs(node_data src)
 	{
 		if(g.getV().contains(src))
@@ -400,31 +432,22 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		if(components.size()==1)
 		{
 			
-			//System.out.println("true");
 			restoreNodes();
 			return components;
 		}
 		else
 		{
 			restoreNodes();
-			//System.out.println("false");
 			return components;
 		}
 		
 	}
 	
 	public List<List<Integer>> getComp()
-	{
-		if(components!=null)
-		{
-			return components;
-		}
-		else
-		{
+	{	
 			List<List<Integer>> tmp = tarjan();
 			restoreNodes();
-			return tmp;
-		}
+			return tmp;		
 	}
 	
 	
@@ -475,13 +498,15 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		node_data destNode=g.getNode(dest);
 		if(srcNode==null || destNode==null)
 			return -1;
-		if(srcNode==destNode)//are the same node
+		if(srcNode==destNode)
 			return 0;		
 		if(destNode.getWeight()==Integer.MAX_VALUE) {
 			return -1;
 		}
 		return destNode.getWeight();
 	}
+	
+	
 	public List<node_data> shortCurrPath(int src, int dest) {
 
 		node_data srcNode=g.getNode(src);
@@ -490,22 +515,21 @@ public class DWGraph_Algo implements dw_graph_algorithms, Serializable{
 		if(srcNode==null || destNode==null) {
 			return null;
 		}
-		if(srcNode==destNode) {//are the same node
+		if(srcNode==destNode) {
 			LinkedList<node_data> myList=new LinkedList<node_data>();
 			myList.add(srcNode);			
 			return myList;
 		}
 		LinkedList<node_data> myList=new LinkedList<node_data>();
 		node_data iterator=destNode;
-		while(iterator!=srcNode) {		
-			myList.add(iterator) ;      
+		while(iterator!=srcNode) 
+		{		
+			myList.add(iterator) ;
 			iterator=g.getNode(iterator.getTag());						
 		}
 		myList.add(iterator);
 		Collections.reverse(myList);
 		return myList;
 	}
-	
-	
 }
 
