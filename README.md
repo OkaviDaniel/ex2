@@ -1,4 +1,4 @@
-# ex2
+## ex2
 Directed and weighted graph implementation
 
 This project is about directed weighted graphs and consists of two parts:
@@ -212,7 +212,7 @@ Allows you to convert distances and locations between the Frame and the real wor
 Point3D-
 Represents a three-dimensional point in space, Athens is used primarily to know where agents and Pokemon are located on the graph.
 
-*Ex2-
+Ex2-
 The class that represents the entire game, presents it visually and contains the algorithms we implemented.
 
 # The project was very interesting , hope you enjoy it!
