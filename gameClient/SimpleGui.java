@@ -65,6 +65,8 @@ public class SimpleGui extends JFrame implements ActionListener {
 		{		
 			if(inputText.getText().length()>0 && inputText2.getText().length()>0)
 			{
+				//The source of .matches(".*[a-z].*")-
+				//https://stackoverflow.com/questions/24086968/tell-if-string-contains-a-z-chars/24087063
 				if(inputText.getText().matches(".*[a-z].*") ||inputText2.getText().matches(".*[a-z].*") )
 				{
 					String message = "You entered worng, Please write again and enter right this time!";

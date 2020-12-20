@@ -25,15 +25,16 @@ public class Ex2_Client implements Runnable{
 	private static int scenario=0;
 	private static boolean cmdT = false;
 	private static boolean Sfull = false;
-	private static boolean itsOkayToMove = false;
-	private static Agent ras  = new Agent();
+	//private static boolean itsOkayToMove = false;
+	//private static Agent ras  = new Agent();
+	
 	
 	
 	private static HashMap<Integer, Pokemon> currFruit;			// <agent id, pokemon>
 	private static HashMap<Integer, List<node_data>> currPath;    //<agent src node, shortest path>
 	private static HashMap<Integer, Integer> currPredator;		//<Pokemon id, Agent id>
 	private static HashMap<Integer, Integer> currPokIsTaken;	//<pokemon id, boolean>
-	
+	private static HashMap<Integer, Integer> eaten_orNot;		//<Pokemon id, boolean>
 	
 	
 	public static void main(String[] a)
@@ -72,25 +73,42 @@ public class Ex2_Client implements Runnable{
 	
 	@Override
 	public void run() {
-		int scenario_num = 23;
+		int scenario_num = scenario;
 		game_service game = Game_Server_Ex2.getServer(scenario_num); // you have [0,23] games
 	//	game.login(id);
 		String g = game.getGraph();
 		DWGraph_Algo ga = new DWGraph_Algo();
 		directed_weighted_graph gg = ga.fromJsonToGraph(g);
-		//String pks = game.getPokemons();
 		init(game);
-//		String agentsJson = game.getAgents();
-//		List<Agent> agents = Arena.getAgents(agentsJson, gg);
+
 
 		game.startGame();
+		MyFrame.setSeconds(game.timeToEnd());// to check
+		
 		_win.setTitle("Ex2 - OOP: "+game.toString());
 		int ind=0;
 		long dt=100;
-		
+		while(game.isRunning() && MyFrame.getSeconds() > 0) {
+			update(game,gg);
+			moveAgants(game, gg);
+			try {			
+				if(ind%1==0) 
+				{
+					_win.repaint();		
+				}
+					Thread.sleep(dt);
+					ind++;
+				}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+
+	}
+		/*
 		while(game.isRunning()) {
 			update(game,gg);
 			moveAgants(game, gg);
+			System.out.println(game.timeToEnd());
 			try {			
 				if(ind%1==0) 
 				{
@@ -104,39 +122,19 @@ public class Ex2_Client implements Runnable{
 				e.printStackTrace();
 			}
 		}
+		*/
 		String res = game.toString();
 
 		System.out.println(res);
 		System.exit(0);
 	}
 	
-	private long st_dt(game_service game, directed_weighted_graph gg) {
-		long ans = -1;
-		DWGraph_Algo ga = new DWGraph_Algo();
-		ga.init(gg);
-		String agentsJson = game.getAgents();
-		List<Agent> agents = Arena.getAgents(agentsJson, gg);
-		for(Agent a: agents)
-		{
-			if(a.getSrcNode()==a.get_curr_fruit().get_edge().getSrc())
-			{
-				a.setCurrentPath(null);
-				game.chooseNextEdge(a.getSrcNode(),a.get_curr_fruit().get_edge().getDest());
-				a.set_curr_fruit(null);
-				a.set_SDT(1514);
-				ans = a.get_sg_dt();
-				return ans;
-			}
-			else
-			{		
-				int tmp = nextNodeImproved(a);
-				game.chooseNextEdge(a.getSrcNode(), tmp);
-			}
-		}
 	
-		return ans;
-	}
-	
+	/**
+	 * Update agents that don't have a current fruit.
+	 * @param game	The game reference from the server.
+	 * @param gg	The graph that the game is works on.
+	 */
 	private static void update(game_service game, directed_weighted_graph gg) 
 	{
 		DWGraph_Algo ga = new DWGraph_Algo();
@@ -149,7 +147,7 @@ public class Ex2_Client implements Runnable{
 		for(Agent a: agents)
 		{
 			//a.get_curr_fruit()==null
-			System.out.println(currFruit.get(a.getID()));
+			//System.out.println(currFruit.get(a.getID()));
 			if(currFruit.get(a.getID())==null)
 			{
 				//System.out.println(a.getCurrentPath());
@@ -174,8 +172,7 @@ public class Ex2_Client implements Runnable{
 									//a.get_curr_fruit().setTaken(false);
 									currPredator.put(currFruit.get(a.getID()).get_edge().getSrc(), null);
 									currPokIsTaken.put(currFruit.get(a.getID()).get_edge().getSrc(), 0);
-									
-									
+				
 								}
 								maxVal = p.getValue();
 								minW = ga.oneCallShrtPathD(a.getSrcNode(), p.get_edge().getSrc());							
@@ -202,9 +199,8 @@ public class Ex2_Client implements Runnable{
 	/** 
 	 * Moves each of the agents along the edge,
 	 * in case the agent is on a node the next destination (next edge) is chosen (randomly).
-	 * @param game
-	 * @param gg
-	 * @param
+	 * @param game	The game reference from the server.
+	 * @param gg	The graph that the game is works on.
 	 */
 	private static void moveAgants(game_service game, directed_weighted_graph gg) {		
 		
@@ -219,20 +215,29 @@ public class Ex2_Client implements Runnable{
 			Agent ag = log.get(i);
 			int id = ag.getID();
 			int dest = ag.getNextNode();
-			int src = ag.getSrcNode();
+			//int src = ag.getSrcNode();
 			double v = ag.getValue();
 			if(dest==-1) {
 				dest = nextNode(gg, ag);
+				if(dest == currFruit.get(ag.getID()).get_edge().getDest())//Then the agent is one step from eating the agent
+				{
+					Pokemon tmp = currFruit.get(ag.getID());
+					currFruit.put(ag.getID(), null);
+					currPredator.remove(tmp.getId());
+					currPath.put(ag.getID(), null);
+					currPokIsTaken.remove(tmp.getId());
+					eaten_orNot.put(tmp.getId(), 0);
+				}
 				game.chooseNextEdge(ag.getID(), dest);
-				System.out.println("Agent: "+id+", val: "+v+"   turned to node: "+dest);
+				//System.out.println("Agent: "+id+", val: "+v+"   turned to node: "+dest);
 			}
 		}
 	}
 	/**
 	 * a very simple random walk implementation!
-	 * @param g
-	 * @param src
-	 * @return
+	 * @param g			The graph that the game is works on.
+	 * @param src		The source vertex.
+	 * @return	int 	The destination vertex.
 	 */
 	private static int nextNode(directed_weighted_graph g, Agent src)
 	{
@@ -240,37 +245,23 @@ public class Ex2_Client implements Runnable{
 		{
 			if(currPath.get(src.getID()).size()==1)
 			{
-				int ans = currFruit.get(src.getID()).get_edge().getDest();
-				currPath.put(src.getID(), null);
+				int ans = currFruit.get(src.getID()).get_edge().getDest();				
 				return ans;
 			}else{//there is a path that longer than one
 				currPath.get(src.getID()).remove(0);
 				return currPath.get(src.getID()).get(0).getKey();
 			}
 		}else {
-			System.out.println(currPath.get(src.getID()));
+			//System.out.println(currPath.get(src.getID()));
 			return -1;
 		}
-		
-		
-		/*
-		int ans = -1;
-		Collection<edge_data> ee = g.getE(src);
-		Iterator<edge_data> itr = ee.iterator();
-		int s = ee.size();
-		int r = (int)(Math.random()*s);
-		int i=0;
-		while(i<r) {itr.next();i++;}
-		ans = itr.next().getDest();
-		return ans;
-		*/
 	}
 	
-	private static int nextNodeImproved(Agent a) {
-		a.getCurrentPath().remove(0);
-		return a.getCurrentPath().get(0).getKey();
-	}
 	
+	/**
+	 * Init the game client by creating a frame, arena and adding the pokemons and agents to the arena.
+	 * @param game	The game reference from the server.
+	 */
 	private void init(game_service game) {
 		String jsong = game.getGraph();
 		String fs = game.getPokemons();
@@ -280,7 +271,8 @@ public class Ex2_Client implements Runnable{
 		_ar = new Arena();
 		_ar.setGraph(g);
 		_ar.setPokemons(Arena.json2Pokemons(fs));
-		_win = new MyFrame("test Ex2");
+		_win = new MyFrame("test Ex2", game.timeToEnd());//To check
+		//_win = new MyFrame("test Ex2");
 		_win.setSize(1000, 700);
 		_win.update(_ar);
 		
@@ -293,6 +285,7 @@ public class Ex2_Client implements Runnable{
 			currPath = new HashMap<Integer, List<node_data>>();
 			currPredator = new HashMap<Integer, Integer>();
 			currPokIsTaken = new HashMap<Integer, Integer>();
+			eaten_orNot = new HashMap<Integer, Integer>();
 			
 			jsonObj = new JSONObject(info);
 			JSONObject gameServerObj = jsonObj.getJSONObject("GameServer");
@@ -313,7 +306,7 @@ public class Ex2_Client implements Runnable{
 					if(pokemons.get(i).getValue()>maxVal &&  currPokIsTaken.get(pokemons.get(i).getId())==0)
 					{
 						j=pokemons.get(i);
-						System.out.println(j.getId());
+						//System.out.println(j.getId());
 						maxVal = pokemons.get(i).getValue();						
 					}
 				}
@@ -326,7 +319,8 @@ public class Ex2_Client implements Runnable{
 				currFruit.put(a.getID(), j);
 				//System.out.println(currFruit.get(a.getID()));
 				currPath.put(a.getID(), ga.shortCurrPath(a.getSrcNode(), j.get_edge().getSrc()));
-				currPredator.put(j.getId(),a.getID());					
+				currPredator.put(j.getId(),a.getID());		
+				eaten_orNot.put(j.getId(), 0);
 				_ar.setAgents(tmp1);
 			}
 		}

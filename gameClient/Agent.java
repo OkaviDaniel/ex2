@@ -1,8 +1,5 @@
 package gameClient;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.json.JSONObject;
 
 import api.GeoLocation;
@@ -13,7 +10,7 @@ import api.geo_location;
 import api.node_data;
 import gameClient.util.Point3D;
 
-public class Agent extends Thread implements Runnable {
+public class Agent {
 	
 	public static final double EPS = 0.0001;
 	//private static int count = 0;
@@ -29,8 +26,7 @@ public class Agent extends Thread implements Runnable {
 	private double value;
 	
 	
-	private List<node_data> currentPath = new ArrayList<>();
-	
+
 	public Agent()
 	{
 		gg = null;
@@ -39,20 +35,7 @@ public class Agent extends Thread implements Runnable {
 		pos = curr_node.getLocation();
 		id = -1;
 		this.speed = 0;
-		currentComp = new ArrayList<Integer>(); //??
 	}
-	
-	public List<node_data> getCurrentPath() {
-		return currentPath;
-	}
-
-	public void setCurrentPath(List<node_data> currentPath) {
-		this.currentPath = currentPath;
-	}
-
-	private List<Integer> currentComp;
-	private int compIndex;
-	//public int indexOnTheComp;
 	
 	public Agent(directed_weighted_graph g, int start_node) 
 	{
@@ -62,19 +45,8 @@ public class Agent extends Thread implements Runnable {
 		pos = curr_node.getLocation();
 		id = -1;
 		this.speed = 0;
-		currentComp = new ArrayList<Integer>(); //??
 		
-	}
-	
-	public int getCompIndex()
-	{
-		return compIndex;
-	}
-	
-	public void setCompIndex(int a)
-	{
-		compIndex = a;
-	}
+	}	
 	
 	public void update(String json) {
 		JSONObject jsonObj;
@@ -120,17 +92,7 @@ public class Agent extends Thread implements Runnable {
 				+ "}";
 		return ans;	
 	}
-	
-	public List<Integer> getComp()
-	{
-		return currentComp;
-	}
-	
-	public void setComp(List<Integer> l)
-	{
-		this.currentComp = l;
-	}
-	
+
 	public int getSrcNode() 
 	{
 		return this.curr_node.getKey();
@@ -260,10 +222,5 @@ public class Agent extends Thread implements Runnable {
 		this.sg_dt = _sg_dt;
 	}
 
-	@Override
-	public void run() 
-	{	
-		
-	}
 	
 }

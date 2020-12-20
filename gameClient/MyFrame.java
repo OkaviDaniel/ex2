@@ -9,6 +9,7 @@ import gameClient.util.Point3D;
 import gameClient.util.Range;
 import gameClient.util.Range2D;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -27,35 +28,46 @@ import java.util.List;
  */
 public class MyFrame extends JFrame implements MouseListener, MouseWheelListener{
 	
-	private int ind;
 	private Arena ar;
 	private gameClient.util.Range2Range w2f;
+	private static long seconds;
 	
+
 	
-	
-	
-	//For zoom panel
-	private double _zoom = 1d, _cZoom = 0.01, _minSize = 1;
-	private int midX, midY, pX, pY; 
-	
-	
-	
-	MyFrame(String a) 
+
+	MyFrame(String a, long timeToEnd) 
 	{
-		super(a);
-		 ind = 0;
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
+		 super(a);
+		 this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		 seconds = Integer.MAX_VALUE;
+		 Thread timer = new Thread(new Runnable() {
+			 @Override
+			 public void run() {
+					try {
+						while(seconds >= 0) {
+							Thread.sleep(1000);
+							seconds-=1000;
+						}
+						
+					}catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+			 }
+		 });
+		 timer.start();
 	}
+	
 	
 	public void update(Arena ar) {
 		this.ar = ar;
 		updateFrame();
 	}
 
+
 	private void updateFrame() {
 		
-		Range rx = new Range(20,this.getWidth()-20);
-		Range ry = new Range(this.getHeight()-20,80);
+		Range rx = new Range(30,this.getWidth()-50);
+		Range ry = new Range(this.getHeight()-50,100);
 		Range2D frame = new Range2D(rx,ry);
 		directed_weighted_graph g = ar.getGraph();
 		w2f = Arena.w2f(g,frame);
@@ -70,13 +82,23 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 		drawGraph(g);
 		drawAgants(g);
 		drawInfo(g);
+		g.setFont(new Font(Font.MONOSPACED, Font.BOLD,20));
+		drawTimer(g);
 
 	}
+	
+	private void drawTimer(Graphics g) {		
+			if(seconds != Integer.MAX_VALUE) {
+				g.setColor(Color.black);
+				g.drawString("Time left: "+(seconds/1000) , this.getWidth()-200,100);
+			}                                                 
+		}          
 	
 	private void drawInfo(Graphics g) {
 		List<String> str = ar.get_info();
 		String dt = "none";
-		for(int i=0;i<str.size();i++) {
+		for(int i=0;i<str.size();i++) 
+		{
 			g.drawString(str.get(i)+" dt: "+dt,100,60+i*20);
 		}
 
@@ -130,18 +152,17 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 	
 	private void drawAgants(Graphics g) {
 		List<Agent> rs = ar.getAgents();
-		//	Iterator<OOP_Point3D> itr = rs.iterator();
 		g.setColor(Color.red);
 		int i=0;
 		while(rs!=null && i<rs.size()) {
 			geo_location c = rs.get(i).getLocation();
 			int r=8;
-			i++;
 			if(c!=null) {
-
 				geo_location fp = this.w2f.world2frame(c);
 				g.fillOval((int)fp.x()-r, (int)fp.y()-r, 2*r, 2*r);
+				g.drawString(""+rs.get(i).getValue(), (int)fp.x(),(int)fp.y()-3*r);
 			}
+			i++;
 		}
 	}
 	
@@ -152,6 +173,7 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 		g.drawString(""+n.getKey(), (int)fp.x(), (int)fp.y()-4*r);
 	}
 	
+	
 	private void drawEdge(edge_data e, Graphics g) {
 		directed_weighted_graph gg = ar.getGraph();
 		geo_location s = gg.getNode(e.getSrc()).getLocation();
@@ -159,8 +181,6 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 		geo_location s0 = this.w2f.world2frame(s);
 		geo_location d0 = this.w2f.world2frame(d);
 		g.drawLine((int)s0.x(), (int)s0.y(), (int)d0.x(), (int)d0.y());
-//		geo_location average=new GeoLocation(x,);
-//		g.drawString(""+n.getKey(), fp.ix(), fp.iy()+2*r);
 	}
 
 	@Override
@@ -197,6 +217,14 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 	public void mouseWheelMoved(MouseWheelEvent arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public static long getSeconds() {
+		return seconds;
+	}
+
+	public static void setSeconds(long seconds) {
+		MyFrame.seconds = seconds;
 	}
 
 }

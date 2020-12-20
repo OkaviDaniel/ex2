@@ -22,7 +22,8 @@ import gameClient.util.Range2Range;
  * @author boaz.benmoshe
  *
  */
-public class Arena {
+public class Arena 
+{
 	public static final double EPS1 = 0.001, EPS2=EPS1*EPS1, EPS=EPS2;
 	private directed_weighted_graph gg;
 	private List<Agent> agents;
@@ -36,12 +37,6 @@ public class Arena {
 		info = new ArrayList<String>();
 	}
 	
-	private Arena(directed_weighted_graph g, List<Agent> r, List<Pokemon> p) 
-	{
-		setGraph(g);
-		this.setAgents(r);
-		this.setPokemons(p);
-	}
 	
 	public void setPokemons(List<Pokemon> f) 
 	{
@@ -122,7 +117,6 @@ public class Arena {
 		
 		ArrayList<Agent> ans = new ArrayList<Agent>();
 		try {
-			//System.out.println(aa);
 			JSONObject ttt = new JSONObject(aa);
 			JSONArray ags = ttt.getJSONArray("Agents");
 			for(int i=0;i<ags.length();i++) {
@@ -130,7 +124,6 @@ public class Arena {
 				c.update(ags.get(i).toString());
 				ans.add(c);
 			}
-			//= getJSONArray("Agents");
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -148,7 +141,6 @@ public class Arena {
 				JSONObject pk = pp.getJSONObject("Pokemon");
 				int t = pk.getInt("type");
 				double v = pk.getDouble("value");
-				//double s = 0;//pk.getDouble("speed");
 				String p = pk.getString("pos");
 			   Pokemon f = new Pokemon(new Point3D(p), t, v, /*0,*/ null);
 				ans.add(f);
@@ -158,9 +150,9 @@ public class Arena {
 		return ans;
 	}
 	
+	
 	public static void updateEdge(Pokemon fr, directed_weighted_graph g) 
 	{
-		//	oop_edge_data ans = null;
 		if(fr!=null && g!= null) {
 		Iterator<node_data> itr = g.getV().iterator();
 		while(itr.hasNext()) {
@@ -181,7 +173,7 @@ public class Arena {
 		boolean ans = false;
 		double dist = src.distance(dest);
 		double d1 = src.distance(p) + p.distance(dest);
-		if(dist>d1-EPS2/**EPS2*/) {ans = true;}
+		if(dist>d1-EPS2) {ans = true;}
 		return ans;
 	}
 	

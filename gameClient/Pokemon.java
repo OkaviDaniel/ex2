@@ -21,32 +21,17 @@ public class Pokemon
 	private int min_ro;
 	private int id;
 	
-	private boolean taken;
-	//private List<Integer> comp;
-	private int x = 10;
-	//private double speed;
-	private Agent predator;
+	//private int x = 10;
 	
 	public Pokemon(Point3D pos, int t, double v,/* double s,*/ edge_data e)
 	{
 		this.pos = pos;
 		this.type = t;
 		this.value = v;
-		//this.speed = s;
 		edge = e;
 		min_dist = -1;
 		min_ro = -1;
-		//comp = new ArrayList<Integer>();
-		taken =false;
 		this.setId(counter++);
-	}
-	
-	public boolean isTaken() {
-		return taken;
-	}
-
-	public void setTaken(boolean taken) {
-		this.taken = taken;
 	}
 
 	public static Pokemon init_from_json(String json)
@@ -63,7 +48,6 @@ public class Pokemon
 			double y1 = Double.parseDouble(arr[1]);
 			double z1 = Double.parseDouble(arr[2]);
 			Point3D pos1 = new Point3D(x1, y1, z1);
-			//double speed1 = u.getDouble("speed");
 			JSONObject r = u.getJSONObject("edge");
 			int src1 = r.getInt("src");
 			int dest1 = r.getInt("dest");
@@ -105,18 +89,12 @@ public class Pokemon
 		return type;
 	}
 	
-/*	
-	public double getSpeed() 
-	{
-		return speed;
-	}
-*/
+
 	public double getValue() 
 	{
 		return value;
 	}
 	
-	//??
 	public double getMin_dist() 
 	{
 		return min_dist;
@@ -127,7 +105,7 @@ public class Pokemon
 		this.min_dist = mid_dist;
 	}
 	
-	//??
+	
 	public int getMin_ro() 
 	{
 		return min_ro;
@@ -136,14 +114,6 @@ public class Pokemon
 	public void setMin_ro(int min_ro) 
 	{
 		this.min_ro = min_ro;
-	}
-
-	public Agent getPredator() {
-		return predator;
-	}
-
-	public void setPredator(Agent predator) {
-		this.predator = predator;
 	}
 
 	public int getId() {
