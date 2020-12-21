@@ -75,9 +75,6 @@ public class Agent {
 		}
 	}
 	
-	//******************* 			*****************************
-	//******************* to change *****************************
-	//******************* 			*****************************
 	public String toJSON() 
 	{
 		int d = this.getNextNode();
@@ -97,11 +94,6 @@ public class Agent {
 	{
 		return this.curr_node.getKey();
 	}
-	
-	public void setSpeed(int i) {
-		this.speed = i;
-	}
-
 
 	public void setMoney(double i) {
 		this.value = i;

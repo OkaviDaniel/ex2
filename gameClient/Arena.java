@@ -173,7 +173,7 @@ public class Arena
 		boolean ans = false;
 		double dist = src.distance(dest);
 		double d1 = src.distance(p) + p.distance(dest);
-		if(dist>d1-EPS2) {ans = true;}
+		if(dist>d1-EPS2*EPS2) {ans = true;}
 		return ans;
 	}
 	
@@ -185,7 +185,7 @@ public class Arena
 		return isOnEdge(p,src,dest);
 	}
 	
-	public static boolean isOnEdge(geo_location p, edge_data e, int type, directed_weighted_graph g)
+	private static boolean isOnEdge(geo_location p, edge_data e, int type, directed_weighted_graph g)
 	{
 		int src = g.getNode(e.getSrc()).getKey();
 		int dest = g.getNode(e.getDest()).getKey();

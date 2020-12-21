@@ -23,7 +23,7 @@ public class Pokemon
 	
 	//private int x = 10;
 	
-	public Pokemon(Point3D pos, int t, double v,/* double s,*/ edge_data e)
+	public Pokemon(Point3D pos, int t, double v, edge_data e)
 	{
 		this.pos = pos;
 		this.type = t;

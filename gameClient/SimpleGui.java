@@ -44,7 +44,7 @@ public class SimpleGui extends JFrame implements ActionListener {
 
 	public SimpleGui()
 	{
-		super("Log In window");
+		super("Login window");
 		this.setBounds(200,200,300,250);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container window = this.getContentPane();
