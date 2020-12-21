@@ -61,6 +61,11 @@ public class Point3D implements geo_location, Serializable{
     	return x+","+y+","+z; 
     }
     
+    /**
+     * Calculate the distance of the current point to another
+     * @param p2 the other point geo location
+     * @return double
+     */
     @Override
     public double distance(geo_location p2) {
         double dx = this.x() - p2.x();
@@ -69,7 +74,12 @@ public class Point3D implements geo_location, Serializable{
         double t = (dx*dx+dy*dy+dz*dz);
         return Math.sqrt(t);
     }
-
+    
+    /**
+     * check if two point are equals or not
+     * @param p other object
+     * @return boolean
+     */
     public boolean equals(Object p) 
     {
         if(p==null || !(p instanceof geo_location)) 
@@ -80,11 +90,21 @@ public class Point3D implements geo_location, Serializable{
         return ( (x==p2.x) && (y==p2.y) && (z==p2.z) );
     }
     
+    /**
+     * Check if two point are very close to each other or not
+     * @param p2 the other point location
+     * @return	boolean
+     */
     public boolean close2equals(geo_location p2) 
     {
         return ( this.distance(p2) < EPS ); 
        }
     
+    /**
+     * check if two point are equals or not
+     * @param p	the other point
+     * @return boolean
+     */
     public boolean equalsXY (Point3D p)
     {
     	return p.x == x && p.y == y;

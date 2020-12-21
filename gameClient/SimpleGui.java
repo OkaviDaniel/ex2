@@ -26,6 +26,11 @@ public class SimpleGui extends JFrame implements ActionListener {
 	private int scenario = 0;
 	private boolean succeed;
 	
+	
+	/**
+	 * return the id of the user
+	 * @return	long
+	 */
 	public long getId() {
 		return id;
 	}
@@ -33,7 +38,11 @@ public class SimpleGui extends JFrame implements ActionListener {
 	public void setId(long id) {
 		this.id = id;
 	}
-
+	
+	/**
+	 * Return the chosen scenario
+	 * @return int
+	 */
 	public int getScenario() {
 		return scenario;
 	}
@@ -59,6 +68,9 @@ public class SimpleGui extends JFrame implements ActionListener {
 		this.succeed = false;
 	}
 	
+	/** check if the userr pressed the button
+	 * @param e
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource()==buttonPress)

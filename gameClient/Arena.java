@@ -54,6 +54,9 @@ public class Arena
 		init();
 	}
 	
+	/**
+	 * Init the arena after we set the graph
+	 */
 	private void init() 
 	{
 		MIN=null; MAX=null;
@@ -113,6 +116,13 @@ public class Arena
 	}
 
 	////////////////////////////////////////////////////
+	
+	/**
+	 * Create a list of agents from the given String and graph
+	 * @param aa	String in Json format
+	 * @param gg	Graph
+	 * @return	List of agents
+	 */
 	public static List<Agent> getAgents(String aa, directed_weighted_graph gg) {
 		
 		ArrayList<Agent> ans = new ArrayList<Agent>();
@@ -130,6 +140,11 @@ public class Arena
 		return ans;
 	}
 	
+	/**
+	 * Takes a String with Json format and create from it an array list of Pokemons
+	 * @param fs	String with Json format
+	 * @return		ArrayList of Pokemons
+	 */
 	public static ArrayList<Pokemon> json2Pokemons(String fs) 
 	{
 		ArrayList<Pokemon> ans = new  ArrayList<Pokemon>();
@@ -150,7 +165,11 @@ public class Arena
 		return ans;
 	}
 	
-	
+	/**
+	 * Updates the edges of the pokemons with the current graph
+	 * @param fr	Pokemon
+	 * @param g		The graph we are working on
+	 */
 	public static void updateEdge(Pokemon fr, directed_weighted_graph g) 
 	{
 		if(fr!=null && g!= null) {
@@ -167,6 +186,14 @@ public class Arena
 	}
 }
 	
+	
+	/**
+	 * Check if the pokemon location is on the edge between two location
+	 * @param p	pokemon geographic location
+	 * @param src	src node geographic location
+	 * @param dest	dest node geographic location
+	 * @return	boolean 
+	 */
 	private static boolean isOnEdge(geo_location p, geo_location src, geo_location dest )
 	{
 
@@ -177,7 +204,14 @@ public class Arena
 		return ans;
 	}
 	
-	
+	/**
+	 * Check if the pokemon is between to nodes on the graph
+	 * @param p pokemon's geo location
+	 * @param s	Src node
+	 * @param d	Dest node
+	 * @param g	Graph
+	 * @return	Boolean
+	 */
 	private static boolean isOnEdge(geo_location p, int s, int d, directed_weighted_graph g) 
 	{
 		geo_location src = g.getNode(s).getLocation();
@@ -185,6 +219,14 @@ public class Arena
 		return isOnEdge(p,src,dest);
 	}
 	
+	/**
+	 * Check if the pokemon is on the edge
+	 * @param p	Pokemon's geo location
+	 * @param e	The edge we want to check
+	 * @param type	The type of the pokemon
+	 * @param g	The graph
+	 * @return
+	 */
 	private static boolean isOnEdge(geo_location p, edge_data e, int type, directed_weighted_graph g)
 	{
 		int src = g.getNode(e.getSrc()).getKey();
@@ -194,6 +236,11 @@ public class Arena
 		return isOnEdge(p,src, dest, g);
 	}
 
+	/**
+	 *  Turns the graph range into Range2D object.
+	 * @param g The graph
+	 * @return	Range2D object that represent the range of the graph
+	 */
 	private static Range2D GraphRange(directed_weighted_graph g)
 	{
 		Iterator<node_data> itr = g.getV().iterator();
@@ -218,6 +265,12 @@ public class Arena
 		return new Range2D(xr,yr);
 	}
 	
+	/**
+	 * Convert the dimensions from world to the frame.
+	 * @param g	The graph
+	 * @param frame	The frame
+	 * @return	Range2Range the range result.
+	 */
 	public static Range2Range w2f(directed_weighted_graph g, Range2D frame) 
 	{
 		Range2D world = GraphRange(g);

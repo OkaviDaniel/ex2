@@ -17,6 +17,11 @@ public class Range2Range {
 		_frame = new Range2D(f);
 	}
 	
+	/**
+	 * Convert from world to frame
+	 * @param p	geographic location
+	 * @return geo_location as a frame dimension
+	 */
 	public geo_location world2frame(geo_location p) 
 	{
 		Point3D d = _world.getPortion(p);
@@ -24,6 +29,11 @@ public class Range2Range {
 		return ans;
 	}
 	
+	/**
+	 * Convert from frame to world
+	 * @param p	geographic location
+	 * @return	geo_location as a world dimension
+	 */
 	public geo_location frame2world(geo_location p) 
 	{
 		Point3D d = _frame.getPortion(p);

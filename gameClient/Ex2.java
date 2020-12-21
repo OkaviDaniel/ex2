@@ -1,9 +1,7 @@
 package gameClient;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONException;
@@ -12,7 +10,6 @@ import org.json.JSONObject;
 import Server.Game_Server_Ex2;
 import api.DWGraph_Algo;
 import api.directed_weighted_graph;
-import api.edge_data;
 import api.game_service;
 import api.node_data;
 
@@ -187,19 +184,13 @@ public class Ex2 implements Runnable{
 			if(dest==-1) {
 				dest = nextNode(gg, ag);
 				if(dest == currFruit.get(ag.getID()).get_edge().getDest())//Then the agent is one step from eating the agent
-				{
-					ag.set_SDT(123);					
-					if(ag.get_sg_dt()<dt)
-					{
-						dt=ag.get_sg_dt();
-					}
+				{					
 					Pokemon tmp = currFruit.get(ag.getID());
 					currFruit.put(ag.getID(), null);
 					currPredator.remove(tmp.get_edge().getSrc());
 					currPath.put(ag.getID(), null);
 					currPokIsTaken.remove(tmp.get_edge().getSrc());
 				}
-				dt=100;
 				game.chooseNextEdge(ag.getID(), dest);
 			}
 		}
@@ -289,7 +280,6 @@ public class Ex2 implements Runnable{
 				currFruit.put(a.getID(), j);
 				currPath.put(a.getID(), ga.shortCurrPath(a.getSrcNode(), j.get_edge().getSrc()));
 				currPredator.put(j.get_edge().getSrc(),a.getID());		
-				//eaten_orNot.put(j.getId(), 0);
 				_ar.setAgents(tmp1);
 			}
 		}
@@ -298,6 +288,4 @@ public class Ex2 implements Runnable{
 			e.printStackTrace();
 		}	
 	}
-	
-	
 }

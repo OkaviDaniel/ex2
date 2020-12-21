@@ -19,6 +19,11 @@ public class Range
 		this(x._min, x._max);
 	}
 	
+	/**
+	 * checks if the given number is in the range
+	 * @param d double
+	 * @return  boolean
+	 */
 	public boolean isIn(double d)
 	{
 		boolean inSide = false;
@@ -36,6 +41,10 @@ public class Range
 		return ans;
 	}
 	
+	/**
+	 * check if the range is empty or not
+	 * @return boolean
+	 */
 	public boolean isEmpty() 
 	{
 		return this.get_min()>this.get_max();

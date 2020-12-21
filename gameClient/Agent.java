@@ -48,6 +48,10 @@ public class Agent {
 		
 	}	
 	
+	/**
+	 * Update the current agent from the given data in Json format
+	 * @param json	String with Json format
+	 */
 	public void update(String json) {
 		JSONObject jsonObj;
 		try {
@@ -75,6 +79,10 @@ public class Agent {
 		}
 	}
 	
+	/**
+	 * Convert the current agent into a String with Json format
+	 * @return  String with Json format
+	 */
 	public String toJSON() 
 	{
 		int d = this.getNextNode();
@@ -90,16 +98,28 @@ public class Agent {
 		return ans;	
 	}
 
+	/**
+	 * A getter for the source node.
+	 * @return int the value of the src node
+	 */
 	public int getSrcNode() 
 	{
 		return this.curr_node.getKey();
 	}
 
+	/**
+	 * Set the money for the current agent.
+	 * @param i	The wanted value
+	 */
 	public void setMoney(double i) {
 		this.value = i;
 	}
 	
-	
+	/**
+	 * Set the destination node of the current agent.
+	 * @param dest	The destination node key
+	 * @return boolean 	Returns true if and only if the next node is a neighbor of the current node
+	 */
 	public boolean setNextNode(int dest)
 	{
 		boolean ans = false;
@@ -121,12 +141,19 @@ public class Agent {
 		this.curr_node = gg.getNode(src);
 	}
 	
+	/**
+	 * Check if the current agent is moving or not on the edge.
+	 * @return boolean
+	 */
 	public boolean isMoving() {
 		return this.curr_edge!=null;
 	}
 	
 	
-	
+	/**
+	 * Get the destination node of the agent
+	 * @return	int the key value of the node
+	 */
 	public int getNextNode() {
 		int ans = -2;
 		if(this.curr_edge==null) 
@@ -140,6 +167,7 @@ public class Agent {
 		return ans;
 	}
 	
+
 	public String toString() {
 		return toJSON();
 	}
@@ -152,6 +180,7 @@ public class Agent {
 		return this.id;
 	}
 
+	
 	public geo_location getLocation() {
 		return pos;
 	}
@@ -178,7 +207,10 @@ public class Agent {
 		this.curr_fruit = curr_fruit;
 	}
 	
-	
+	/**
+	 * get a default number and calculate the time it takes to the agent to move to the next node.
+	 * @param ddtt  A default number
+	 */
 	public void set_SDT(long ddtt) 
 	{
 		long ddt = ddtt;
@@ -205,10 +237,18 @@ public class Agent {
 		return this.curr_edge;
 	}
 	
+	 /**
+	  * Get the time to get to the destination
+	  * @return long the time to get to the destination
+	  */
 	public long get_sg_dt() {
 		return sg_dt;
 	}
 	
+	/**
+	 * Set the time to get to the destination
+	 * @param _sg_dt the wanted time
+	 */
 	public void set_sg_dt(long _sg_dt) 
 	{
 		this.sg_dt = _sg_dt;

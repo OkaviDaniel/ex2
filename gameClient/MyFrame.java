@@ -57,13 +57,18 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 		 timer.start();
 	}
 	
-	
+	/**
+	 * update the frame with the given arena
+	 * @param ar	The given arena
+	 */
 	public void update(Arena ar) {
 		this.ar = ar;
 		updateFrame();
 	}
 
-
+	/**
+	 * Updates the frame with the arena dimensions.
+	 */
 	private void updateFrame() {
 		
 		Range rx = new Range(30,this.getWidth()-50);
@@ -73,6 +78,9 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 		w2f = Arena.w2f(g,frame);
 	}
 	
+	/**
+	 * Paint the whole objects on the frame
+	 */
 	public void paint(Graphics g) {
 		int w = this.getWidth();
 		int h = this.getHeight();
@@ -87,6 +95,10 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 
 	}
 	
+	/**
+	 * Draw the remains time on the frame
+	 * @param g Graphics
+	 */
 	private void drawTimer(Graphics g) {		
 			if(seconds != Integer.MAX_VALUE) {
 				g.setColor(Color.black);
@@ -94,6 +106,10 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 			}                                                 
 		}          
 	
+	/**
+	 * Draw the info of the arena on the frame
+	 * @param g Graphics
+	 */
 	private void drawInfo(Graphics g) {
 		List<String> str = ar.get_info();
 		String dt = "none";
@@ -104,6 +120,10 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 
 	}
 	
+	/**
+	 * Draw the graph on the frame
+	 * @param g Graphics
+	 */
 	private void drawGraph(Graphics g) {
 		directed_weighted_graph gg = ar.getGraph();
 		Iterator<node_data> iter = gg.getV().iterator();
@@ -120,6 +140,10 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 		}
 	}
 	
+	/**
+	 * Draw the pokemons on the frame
+	 * @param g Graphics
+	 */
 	private void drawPokemons(Graphics g) {
 		if(ar==null)
 		{
@@ -150,6 +174,10 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 		}	
 	}
 	
+	/**
+	 * Draw the agents on the frame
+	 * @param g Graphics
+	 */
 	private void drawAgants(Graphics g) {
 		List<Agent> rs = ar.getAgents();
 		g.setColor(Color.red);
@@ -166,6 +194,13 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 		}
 	}
 	
+	
+	/**
+	 * Draw the node on 
+	 * @param n the node we want to draw
+	 * @param r	a default number
+	 * @param g Graphics
+	 */
 	private void drawNode(node_data n, int r, Graphics g) {
 		geo_location pos = n.getLocation();
 		geo_location fp = this.w2f.world2frame(pos);
@@ -174,6 +209,11 @@ public class MyFrame extends JFrame implements MouseListener, MouseWheelListener
 	}
 	
 	
+	/**
+	 *  Draw the edge on the frame
+	 * @param e the edge we want to draw
+	 * @param g Graphics
+	 */
 	private void drawEdge(edge_data e, Graphics g) {
 		directed_weighted_graph gg = ar.getGraph();
 		geo_location s = gg.getNode(e.getSrc()).getLocation();

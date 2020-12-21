@@ -21,6 +21,11 @@ public class Range2D
 		y_range = new Range(w.y_range);
 	} 
 	
+	/**
+	 * Getting the portion of the given location
+	 * @param p the given location
+	 * @return	Point3D the portion
+	 */
 	public Point3D getPortion(geo_location p) 
 	{
 		double x = x_range.getPortion(p.x());
@@ -28,6 +33,11 @@ public class Range2D
 		return new Point3D(x,y,0);
 	}
 	
+	/**
+	 * returns the location from the given portion
+	 * @param p the given location
+	 * @return	Point3D the new location
+	 */
 	public Point3D fromPortion(geo_location p) 
 	{
 		double x = x_range.fromPortion(p.x());

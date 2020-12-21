@@ -21,7 +21,6 @@ public class Pokemon
 	private int min_ro;
 	private int id;
 	
-	//private int x = 10;
 	
 	public Pokemon(Point3D pos, int t, double v, edge_data e)
 	{
@@ -34,6 +33,11 @@ public class Pokemon
 		this.setId(counter++);
 	}
 
+	/**
+	 * Init a pokemon from a Json String
+	 * @param json A string with json format
+	 * @return Pokemon 
+	 */
 	public static Pokemon init_from_json(String json)
 	{
 		try
@@ -64,11 +68,18 @@ public class Pokemon
 		return null;
 	}
 	
+	/** return a string with a data of the pokemon
+	 * @return String
+	 */
 	public String toString()
 	{
 		return "F:{v="+ value + ", t=" + type + "}";
 	}
 	
+	/**
+	 * Return the edge of the pokemon
+	 * @return edge_data edge
+	 */
 	public edge_data get_edge()
 	{
 		return edge;
@@ -79,22 +90,37 @@ public class Pokemon
 		this.edge = _edge;
 	}
 	
+	/**
+	 * return the geo location of the node
+	 * @return Point3D location
+	 */
 	public Point3D getLocation()
 	{
 		return pos;
 	}
 	
+	/**
+	 * returns the type of the pokemon
+	 * @return int type
+	 */
 	public int getType() 
 	{
 		return type;
 	}
 	
-
+	/**
+	 * return the value of the pokemon
+	 * @return double
+	 */
 	public double getValue() 
 	{
 		return value;
 	}
 	
+	/**
+	 * return the min distance of the pokemon
+	 * @return double
+	 */
 	public double getMin_dist() 
 	{
 		return min_dist;
