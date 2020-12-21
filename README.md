@@ -118,13 +118,13 @@ This function helps in the second part of the project.
 Similar to the ShortestPathDist function returns the weight of the most efficient / cheapest way from a source vertex to a destination vertex, without reusing the dijkstra algorithm.
 pay attention! To use this function you must first use their algorithm dijkstra with the requested vertex and then you can use this function and search
 The efficient ways without using dijkstra again.
-O (n) where n is the number of vertices on the graph
+O (1) 
 
 * shortCurrPath () -
 Similar to the shortestPath function returns the path itself (Node_data List) of the most efficient / cheapest path from a source vertex to a destination vertex, without reusing the dijkstra algorithm.
 pay attention! To use this function you must first use their algorithm dijkstra with the requested vertex and then you can use this function and search
 The efficient ways without using dijkstra again.
-O (1)
+O (n) where n is the number of vertices on the graph
 
 ## second part:
 
