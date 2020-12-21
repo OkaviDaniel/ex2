@@ -124,7 +124,7 @@ O (n) where n is the number of vertices on the graph
 Similar to the shortestPath function returns the path itself (Node_data List) of the most efficient / cheapest path from a source vertex to a destination vertex, without reusing the dijkstra algorithm.
 pay attention! To use this function you must first use their algorithm dijkstra with the requested vertex and then you can use this function and search
 The efficient ways without using dijkstra again.
-O (n) where n is the number of vertices on the graph
+O (1)
 
 ## second part:
 
